@@ -35,8 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 const hoje = new Date().toISOString().split("T")[0];
                 dataInput.value = hoje;
                 
-                // (Opcional) Destaca levemente a linha selecionada
-                tr.style.backgroundColor = "rgba(30, 136, 229, 0.05)"; 
+                // Destaca levemente a linha selecionada em verde claro
+                tr.style.backgroundColor = "rgba(67, 160, 71, 0.05)"; 
             } else {
                 // Desabilita, limpa a data e remove o destaque se desmarcar
                 dataInput.disabled = true;
