@@ -262,6 +262,8 @@ button{
   padding: 16px;
 }
   
+
+
 /* ================= RELATÓRIO (PDF) ================= */
 .report{ background:#fff; border-radius:18px; }
 .report-header{
@@ -395,12 +397,14 @@ button{
     margin: 0 !important;
     max-width: 100% !important;
     padding: 0 !important;
-  }
+      }
   .card{ box-shadow:none !important; border:none !important; }
   .matrix-card, .perfil-card{ border:1px solid rgba(0,0,0,.15) !important; }
   .matrix-card{ overflow: visible !important; }
   .perfil-card{ overflow: visible !important; }
-  .report{ margin-top: 0 !important; }
+  .report{
+    margin-top: 0 !important;
+    }
   .report .section,
   .report .perfil-card,
   .report .canvas-wrap,
@@ -410,146 +414,263 @@ button{
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
+
+  /* A matriz pode ser grande: permite quebrar, mas sem clipar */
   .report .matrix-card{
     break-inside: auto !important;
     page-break-inside: auto !important;
-    overflow: visible !important;
+    overflow: visible !important;   /* MUITO importante p/ não cortar */
   }
+
+  /* Evita cortar linhas da tabela no meio da página */
   .report .wisc-matrix tr{
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
-  .report .perfil-canvas{
-    height: 340px !important; 
+    .report .perfil-canvas{
+    height: 340px !important; /* reduz só no PDF */
   }
   .page-break-after{
     break-after: page !important;
     page-break-after: always !important;
+          }
+  
+    }
   }
-}
+
 
 /* =========================================
    CHECKLIST 1 — Cards em formato RETRATO
+   (apenas tamanho de cada item, sem mudar estrutura)
+   Baseado no modelo oficial do WISC-IV
    ========================================= */
 
-.report .section{ max-width: 420px; margin: 0 auto 18px; }
-.report .canvas-wrap{ max-width: 380px; margin-left: auto; margin-right: auto; }
-.report .perfil-canvas{ height: 420px; }
-.report table.table{ max-width: 420px; margin-left: auto; margin-right: auto; }
-.report .matrix-card{ max-width: 420px; margin-left: auto; margin-right: auto; }
-.report .matrix-card{ overflow-x: hidden; overflow-y: visible; }
-.report .wisc-matrix th, .report .wisc-matrix td{ padding: 4px 4px; font-size: 9.5px; }
-.report .wisc-matrix .col-sub{ min-width: 0; width: auto; white-space: normal; line-height: 1.15; }
-.report .wisc-matrix .col-pb, .report .wisc-matrix .col-pp{ width: 56px; }
-.report .wisc-matrix .idx{ width: 46px; }
-.report .table{ font-size: 10px; }
-.report .table th, .report .table td{ padding: 5px 6px; }
-.report .table th{ background: rgba(13,71,161,.06); }
-.report .section{ margin-top: 12px; padding: 12px 14px; }
-.report h3{ font-size: 13px; font-weight: 700; letter-spacing: .2px; margin-bottom: 6px; }
-.report h3 + .perfil-card, .report h3 + .matrix-card, .report h3 + .canvas-wrap, .report h3 + table{ margin-top: 6px; }
-.report p.muted{ font-size: 9.5px; margin-top: 6px; }
-.report-header{ padding: 12px 16px; gap: 12px; }
-.report-title .t1{ font-size: 20px; font-weight: 800; }
-.report-title .t2{ font-size: 11.5px; margin-top: 5px; }
-.report-meta{ min-width: 140px; font-size: 9.5px; }
-.report-logo{ width: 36px; height: 36px; }
+.report .section{
+  max-width: 420px;       /* item mais estreito */
+  margin: 0 auto 18px;    /* centraliza + espaço vertical */
+}
 
+.report .canvas-wrap{
+  max-width: 380px;       /* gráfico mais estreito */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.report .perfil-canvas{
+  height: 420px;          /* mais alto para acomodar canvas 520 */
+}
+
+.report table.table{
+  max-width: 420px;       /* tabelas não esticam */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.report .matrix-card{
+  max-width: 420px;       /* matriz no mesmo padrão */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== Item 5: Matriz de conversão sem scroll (retrato) ===== */
+.report .matrix-card{
+  overflow-x: hidden;   /* remove scroll horizontal */
+  overflow-y: visible;
+}
+
+.report .wisc-matrix th,
+.report .wisc-matrix td{
+  padding: 4px 4px;     /* mais compacto */
+  font-size: 9.5px;     /* menor pra caber */
+}
+
+.report .wisc-matrix .col-sub{
+  min-width: 0;         /* remove min-width que estoura */
+  width: auto;
+  white-space: normal;  /* permite quebrar linha */
+  line-height: 1.15;
+}
+
+.report .wisc-matrix .col-pb,
+.report .wisc-matrix .col-pp{
+  width: 56px;          /* colunas numéricas mais estreitas */
+}
+
+.report .wisc-matrix .idx{
+  width: 46px;          /* índices mais estreitos */
+}
+
+/* ===== Item 6: Tabelas do relatório mais compactas ===== */
+.report .table{
+  font-size: 10px;          /* reduz a tipografia no relatório */
+}
+
+.report .table th,
+.report .table td{
+  padding: 5px 6px;         /* menos altura */
+}
+
+.report .table th{
+  background: rgba(13,71,161,.06); /* mais leve */
+}
+
+/* ===== Item 9: Hierarquia e espaçamento de seções (laudo clínico) ===== */
+.report .section{
+  margin-top: 12px;
+  padding: 12px 14px;
+}
+
+.report h3{
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  margin-bottom: 6px;
+}
+
+.report h3 + .perfil-card,
+.report h3 + .matrix-card,
+.report h3 + .canvas-wrap,
+.report h3 + table{
+  margin-top: 6px;
+}
+
+.report p.muted{
+  font-size: 9.5px;
+  margin-top: 6px;
+}
+
+/* ===== Item 10: Cabeçalho final do relatório ===== */
+.report-header{
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+.report-title .t1{
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.report-title .t2{
+  font-size: 11.5px;
+  margin-top: 5px;
+}
+
+.report-meta{
+  min-width: 140px;
+  font-size: 9.5px;
+}
+
+.report-logo{
+  width: 36px;
+  height: 36px;
+}
+
+/* ===== Impressão clínica (Ctrl+P / window.print) ===== */
 @media print{
   @page{ size: A4; margin: 12mm; }
+
+  /* imprime cores direitinho */
   *{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  /* some com tudo fora do relatório */
   body *{ visibility: hidden !important; }
-  #relatorio, #relatorio *{ visibility: visible !important; }
-  #relatorio{ position: absolute; left: 0; top: 0; width: 100%; }
-  .main{ margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
+
+  /* mostra só o relatório */
+  #relatorio, #relatorio *{
+    visibility: visible !important;
+  }
+
+  /* posiciona o relatório no topo da página */
+  #relatorio{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* remove margens “de site” */
+  .main{
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* não imprimir botões */
   .no-print{ display: none !important; }
-  .report .section, .report .perfil-card, .report .matrix-card, .report .report-header, .report .report-info, .report .report-footer{ break-inside: avoid !important; page-break-inside: avoid !important; }
-  .report .matrix-card{ overflow: visible !important; }
-  .report .perfil-canvas{ height: 340px !important; }
+
+  /* evita cortar blocos no meio */
+  .report .section,
+  .report .perfil-card,
+  .report .matrix-card,
+  .report .report-header,
+  .report .report-info,
+  .report .report-footer{
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* overflow em PDF costuma cortar: deixa visível */
+  .report .matrix-card{
+    overflow: visible !important;
+  }
+
+  /* altura do gráfico no PDF para evitar quebrar */
+  .report .perfil-canvas{
+    height: 340px !important;
+  }
 }
 
-.btn-print{ border: 1px solid rgba(13,71,161,.25); background: rgba(13,71,161,.06); color: rgba(13,71,161,.95); border-radius: 10px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
-.duas-colunas{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px; }
-.card-relatorio{ background:#eef6ff; border:1px solid #cfe3ff; border-radius:12px; padding:12px; }
-.card-relatorio table{ width:100%; }
-
-@media(max-width:1100px){ .duas-colunas{ grid-template-columns:1fr; } }
-@media print{ .duas-colunas{ grid-template-columns:1fr 1fr !important; } }
-.perfil-canvas{ min-height: 560px; }
-.interp{ text-align: justify; line-height: 1.55; margin: 8px 0; }
-
-/* =========================================
-   ESTILOS EXCLUSIVOS DO CHECKLIST
-   ========================================= */
-
-/* Estilo das Abas com design interligado */
-.tabs {
-  display: flex;
-  gap: 8px;
-  border-bottom: 2px solid var(--border);
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  padding: 12px 24px;
-  background: transparent;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-  border-radius: 12px 12px 0 0;
-  transition: all 0.2s ease;
-  position: relative;
-  bottom: -2px; /* Faz o botão descer 2px para sobrepor a borda de baixo */
-  border-bottom: 2px solid transparent;
-}
-
-.tab-btn:hover {
-  background: rgba(30,136,229,.04);
-  color: var(--blueDark);
-}
-
-.tab-btn.active {
-  color: var(--blueDark);
-  border-bottom: 2px solid var(--blue);
-  background: rgba(30,136,229,.08);
-}
-
-/* Esconde e mostra os conteúdos das abas com animação leve */
-.tab-content {
-  display: none;
-  animation: fadeIn 0.3s ease;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Ajuste específico para a tabela do checklist */
-.col-selecao { width: 70px; text-align: center !important; }
-.col-data { width: 170px; }
-
-.check-teste {
-  transform: scale(1.4);
-  cursor: pointer;
-  accent-color: var(--blue);
-}
-
-.input-data {
+/* botão print (só visual) */
+.btn-print{
+  border: 1px solid rgba(13,71,161,.25);
+  background: rgba(13,71,161,.06);
+  color: rgba(13,71,161,.95);
+  border-radius: 10px;
   padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  width: 100%;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.input-data:disabled {
-  background: var(--bg);
-  color: transparent;
-  border-color: var(--border);
+.duas-colunas{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:12px;
+}
+
+.card-relatorio{
+  background:#eef6ff;
+  border:1px solid #cfe3ff;
+  border-radius:12px;
+  padding:12px;
+}
+
+/* evitar overflow de tabela */
+.card-relatorio table{
+  width:100%;
+}
+
+/* mobile */
+@media(max-width:1100px){
+  .duas-colunas{
+    grid-template-columns:1fr;
+  }
+}
+
+/* PDF */
+@media print{
+  .duas-colunas{
+    grid-template-columns:1fr 1fr !important;
+  }
+}
+
+.perfil-canvas{
+  min-height: 560px;
+}
+
+.interp{
+  text-align: justify;
+  line-height: 1.55;
+  margin: 8px 0;
 }
