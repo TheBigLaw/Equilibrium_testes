@@ -1,199 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checklist de Avaliação - Equilibrium</title>
-    <style>
-        :root {
-            --primary-color: #0056b3;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --border-color: #dddddd;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            background-color: var(--card-bg);
-            width: 100%;
-            max-width: 1200px;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: var(--primary-color);
-        }
-
-        .btn-voltar {
-            padding: 8px 16px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .btn-voltar:hover {
-            background-color: #5a6268;
-        }
-
-        /* Informações do Paciente */
-        .paciente-info {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 2fr;
-            gap: 15px;
-            margin-bottom: 30px;
-            background: #f9fbfd;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .input-group label {
-            font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        .input-group input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .idade-group {
-            display: flex;
-            gap: 5px;
-        }
-
-        .idade-group input {
-            width: 100%;
-            text-align: center;
-        }
-
-        /* Sistema de Abas */
-        .tabs {
-            display: flex;
-            gap: 5px;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            padding: 12px 24px;
-            background: none;
-            border: none;
-            font-size: 16px;
-            font-weight: bold;
-            color: #777;
-            cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn:hover {
-            background-color: #e9ecef;
-        }
-
-        .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
-            background-color: rgba(0, 86, 179, 0.05);
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Tabela */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
-            text-align: left;
-        }
-
-        th {
-            background-color: #f8f9fa;
-            color: #333;
-            font-weight: 600;
-        }
-
-        tbody tr:hover {
-            background-color: #f1f5f9;
-        }
-
-        .col-selecao {
-            width: 60px;
-            text-align: center;
-        }
-
-        input[type="checkbox"] {
-            transform: scale(1.4);
-            cursor: pointer;
-            accent-color: var(--primary-color);
-        }
-
-        .col-data input {
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #fff;
-        }
-
-        .col-data input:disabled {
-            background-color: #e9ecef;
-            color: transparent;
-            border-color: #ddd;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <base href="/Equilibrium_adm/">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Equilibrium Adm | Check List</title>
+  <link rel="stylesheet" href="/Equilibrium_adm/style.css" />
+  <link rel="icon" type="image/png" href="/Equilibrium_adm/logo.png" />
 </head>
+<body>
+  <header class="app-header">
+    <button class="back-btn" onclick="history.back()">← Voltar</button>
+    <div class="logo-wrap">
+      <img class="logo" src="/Equilibrium_adm/logo2.png" alt="Logo" />
+    </div>
+    <button class="exit-btn" onclick="logout()">Sair</button>
+  </header>
 <body>
 
 <div class="container">
