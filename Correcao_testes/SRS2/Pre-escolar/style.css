@@ -484,6 +484,42 @@ td{
   color:#555;
 }
 
+/* ================================================== */
+/* MODO PACIENTE: INTERFACE LIMPA (OCULTAR ELEMENTOS) */
+/* ================================================== */
+
+/* 1. Oculta o botão "Recalcular" */
+#btnRecalc {
+  display: none !important;
+}
+
+/* 2. Oculta a pílula do "Formulário: Pré-Escolar" */
+.pill:has(#pillForm) {
+  display: none !important;
+}
+
+/* 3. Oculta a barra lateral direita inteira (Resultados e Auditoria) */
+.grid > aside.card {
+  display: none !important;
+}
+
+/* 4. Reajusta a página: Como tirámos a barra direita, centralizamos o questionário */
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr !important;
+    max-width: 850px !important; /* Não deixa as perguntas esticarem de forma exagerada no ecrã do PC */
+    margin: 0 auto !important; /* Centraliza tudo perfeitamente */
+  }
+}
+
+@media (min-width: 980px) and (max-width: 1099px) {
+  .grid { 
+    grid-template-columns: 1fr !important; 
+    max-width: 850px !important;
+    margin: 0 auto !important;
+  }
+}
+
 /* ========================================= */
 /* RELATÓRIO (ESCONDIDO NA TELA NORMAL)      */
 /* ========================================= */
