@@ -288,6 +288,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("#btnClear").addEventListener("click", () => {
       limparTudo();
     });
+    instalarBotaoEnviar(); // <-- COLE ESTA LINHA AQUI
+
+  }catch(err){
     instalarPrintComRelatorio();
 
   }catch(err){
@@ -600,25 +603,23 @@ for(const r of rows){
   document.getElementById("repInterpretation").innerHTML = buildInterpretationText();
 }
 
-// IMPORTANTE: garantir que o botão Print preencha o relatório antes
-// Troque seu handler atual do btnPrint por este:
-function instalarPrintComRelatorio(){
-  const btn = document.getElementById("btnPrint");
-  if(!btn) return;
+// Vincula o botão "Finalizar e Enviar" à função de geração de PDF e envio para o Drive
+function instalarBotaoEnviar() {
+  const btnEnviar = document.getElementById("btnEnviar");
+  if (btnEnviar) {
+    btnEnviar.addEventListener("click", () => {
+      finalizarEEnviar();
+    });
+  }
+}
 
-btn.addEventListener("click", () => {
+function finalizarEEnviar() {
+  // 1. Garante que os cálculos foram feitos e O RELATÓRIO FOI MONTADO antes de gerar o PDF
   const result = calcularEExibir();
   if(result){
     preencherRelatorioSRS2(result);
   }
-  window.print();
-});
-}
-
-function finalizarEEnviar() {
-  // 1. Garante que os cálculos foram feitos antes de gerar o PDF
-  calcularEExibir();
-
+  
   // 2. Muda visualmente o botão para mostrar que está a carregar
   const btn = document.getElementById("btnEnviar");
   if (btn) {
