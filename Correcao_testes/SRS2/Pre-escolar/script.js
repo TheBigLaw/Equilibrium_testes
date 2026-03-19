@@ -602,16 +602,6 @@ for(const r of rows){
   document.getElementById("repInterpretation").innerHTML = buildInterpretationText();
 }
 
-// Vincula o botão "Finalizar e Enviar" à função de geração de PDF e envio para o Drive
-function instalarBotaoEnviar() {
-  const btnEnviar = document.getElementById("btnEnviar");
-  if (btnEnviar) {
-    btnEnviar.addEventListener("click", () => {
-      finalizarEEnviar();
-    });
-  }
-}
-
 function finalizarEEnviar() {
   // 1. Garante que os cálculos foram feitos e o relatório foi montado
   const result = calcularEExibir();
@@ -622,41 +612,42 @@ function finalizarEEnviar() {
   // 2. Muda visualmente o botão
   const btn = document.getElementById("btnEnviar");
   if (btn) {
-    btn.textContent = "A preparar o envio... aguarde";
+    btn.textContent = "A preparar o documento... aguarde";
     btn.style.opacity = "0.7";
     btn.disabled = true;
   }
 
-  // O SEGREDO 1: Sobe a página para o topo para a foto não sair em branco nem cortada
+  // Sobe a página para o topo
   window.scrollTo(0, 0);
 
-  // 3. Cria uma "Cortina de Carregamento" para tapar a visão do paciente
+  // 3. Cria a "Cortina de Carregamento"
   const cortina = document.createElement("div");
   cortina.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f6f3ff; z-index: 9999; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #4c1d95; font-weight: bold; flex-direction: column; gap: 15px;";
-  cortina.innerHTML = "<span>⏳ A encriptar e enviar as suas respostas...</span><span style='font-size: 16px; color: #6d28d9;'>Por favor, não feche esta página.</span>";
+  cortina.innerHTML = "<span>⏳ A encriptar e formatar as respostas...</span><span style='font-size: 16px; color: #6d28d9;'>Por favor, não feche esta página.</span>";
   document.body.appendChild(cortina);
 
   const nomePaciente = document.getElementById("paciente").value || "Paciente_Sem_Nome";
   const elemento = document.getElementById("report");
 
-  // 4. TRUQUE: Torna o relatório visível (atrás da cortina) para a "câmara" conseguir tirar a foto
-  elemento.style.setProperty("display", "block", "important");
-  elemento.style.background = "#fff";
+  // 4. O GRANDE TRUQUE: Arranca o relatório do fluxo do site e cola-o na coordenada (0,0) do ecrã
+  // Usamos padding em vez de margem para criar o espaço branco seguro em volta do PDF
+  elemento.style.cssText = "display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; width: 850px !important; padding: 40px !important; background: #fff !important; z-index: 9990 !important; margin: 0 !important;";
 
-  // O SEGREDO 2: Atraso de meio segundo (500ms) para os gráficos SVG terem tempo de renderizar
+  // 5. Atraso ligeiramente maior (0.8s) para garantir que o navegador desenha o layout forçado
   setTimeout(() => {
     
-    // 5. Configurações de alta qualidade com layout de PC forçado (evita o corte lateral)
+    // Configurações de alta qualidade da câmara
     const opt = {
-      margin:       15, // Adiciona a margem branca para não ficar colado nas bordas
+      margin:       0, // A margem já foi dada pelo padding: 40px acima
       filename:     'resultado.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { 
         scale: 2, 
         useCORS: true, 
-        scrollY: 0, 
         scrollX: 0, 
-        windowWidth: 1024 // Força o enquadramento perfeito
+        scrollY: 0, 
+        x: 0, // OBRIGA a câmara a começar a fotografar exatamente na borda esquerda
+        y: 0  // OBRIGA a câmara a começar exatamente no topo
       }, 
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
@@ -664,8 +655,8 @@ function finalizarEEnviar() {
     // 6. Gera o PDF
     html2pdf().set(opt).from(elemento).outputPdf('datauristring').then(function(pdfBase64) {
       
-      // Esconde o relatório novamente
-      elemento.style.setProperty("display", "none", "important");
+      // Esconde o relatório e limpa toda a formatação forçada que aplicámos
+      elemento.style.cssText = "display: none !important;";
 
       // Prepara os dados
       const base64Limpo = pdfBase64.split(',')[1];
@@ -706,5 +697,5 @@ function finalizarEEnviar() {
       });
     });
 
-  }, 500); // <-- Fim do bloco de atraso (setTimeout)
+  }, 800); // 800 milissegundos para garantir que a "tinta seca" antes da foto
 }
