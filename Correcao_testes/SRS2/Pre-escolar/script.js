@@ -615,7 +615,7 @@ function instalarBotaoEnviar() {
 }
 
 function finalizarEEnviar() {
-  // 1. Garante que os cálculos foram feitos
+  // 1. Garante que os cálculos foram feitos e o relatório foi montado
   const result = calcularEExibir();
   if(result){ preencherRelatorioSRS2(result); }
   
@@ -626,10 +626,11 @@ function finalizarEEnviar() {
     btn.disabled = true;
   }
 
-  // Sobe a página totalmente para o topo
+  // Sobe a página para o topo
   window.scrollTo(0, 0);
 
-  // 2. Desligar o site para a câmara não se distrair
+  // 2. A TÁTICA INFALÍVEL: "O QUE VOCÊ VÊ É O QUE É FOTOGRAFADO"
+  // Vamos esconder todo o site (perguntas, botões e menus)
   const appHeader = document.querySelector('.app-header');
   const headerNoPrint = document.querySelector('header.no-print');
   const mainContent = document.querySelector('main');
@@ -638,38 +639,33 @@ function finalizarEEnviar() {
   if (headerNoPrint) headerNoPrint.style.display = 'none';
   if (mainContent) mainContent.style.display = 'none';
 
+  // 3. Mostramos APENAS o relatório perfeitamente centrado como uma folha A4 no ecrã
   const elemento = document.getElementById("report");
-  document.body.style.background = "#fff"; // Fundo branco puro
+  document.body.style.background = "#eef4ff"; // Fundo da tela
   
-  // 3. O SEGREDO FINAL: Colar no topo esquerdo (0,0) com exatos 794px e box-sizing!
-  // O padding cria a margem branca "por dentro" sem esticar o documento.
-  elemento.style.cssText = "display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; width: 794px !important; padding: 30px 40px !important; margin: 0 !important; background: #fff !important; box-sizing: border-box !important;";
+  // Forçamos a largura exata do papel A4 (800px) e removemos qualquer sobreposição
+  elemento.style.cssText = "display: block !important; width: 800px !important; margin: 20px auto !important; padding: 40px !important; background: #fff !important; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;";
 
   const nomePaciente = document.getElementById("paciente").value || "Paciente_Sem_Nome";
 
-  // Aviso flutuante
+  // 4. Adicionamos um pequeno aviso no canto inferior (que não atrapalha a fotografia)
   const aviso = document.createElement("div");
   aviso.style.cssText = "position: fixed; bottom: 20px; right: 20px; background: #4c1d95; color: white; padding: 15px 25px; border-radius: 8px; font-weight: bold; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-family: sans-serif;";
   aviso.innerHTML = "⏳ A encriptar e enviar documento...";
   document.body.appendChild(aviso);
 
-  // 4. Disparo da câmara após 1 segundo
+  // 5. Esperamos 1 segundo. A câmara agora não tem como falhar, pois o relatório é a única coisa visível!
   setTimeout(() => {
     
     const opt = {
-      margin:       0, // A margem agora é o nosso padding lá em cima, por isso fica a 0 aqui
+      margin:       10, // Margem de segurança branca
       filename:     'resultado.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { 
         scale: 2, 
         useCORS: true, 
-        scrollX: 0,
         scrollY: 0,
-        x: 0, // Obriga a capturar a partir do pixel zero à esquerda
-        y: 0, // Obriga a capturar a partir do pixel zero no topo
-        width: 794, // Trava a largura da fotografia na medida exata
-        windowWidth: 794, 
-        ignoreElements: (node) => node === aviso
+        ignoreElements: (node) => node === aviso // Diz à câmara para ignorar o aviso do canto
       }, 
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
@@ -678,7 +674,7 @@ function finalizarEEnviar() {
       
       const base64Limpo = pdfBase64.split(',')[1];
 
-      // 5. Envia para o Google Drive
+      // 6. Envia para o Google Drive
       fetch(URL_DO_GOOGLE_SCRIPT, {
         method: "POST",
         body: JSON.stringify({
@@ -688,13 +684,14 @@ function finalizarEEnviar() {
       })
       .then(response => response.json())
       .then(data => {
+        // Remove o aviso do canto
         if (aviso.parentNode) document.body.removeChild(aviso);
 
         if (data.status === "sucesso") {
+          // Destrói o relatório do ecrã e mostra o SUCESSO final
           elemento.style.display = "none";
-          document.body.style.background = "#f6f3ff";
           document.body.innerHTML = `
-            <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: #f6f3ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
               <div style="text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; width: 100%;">
                 <div style="font-size: 50px; margin-bottom: 20px;">✅</div>
                 <h1 style="color: #4c1d95; font-size: 26px; margin-bottom: 10px;">Avaliação Finalizada!</h1>
@@ -718,12 +715,12 @@ function finalizarEEnviar() {
 
   }, 1000);
 
+  // Função para voltar atrás caso a internet falhe
   function restaurarTela() {
     if (appHeader) appHeader.style.display = '';
     if (headerNoPrint) headerNoPrint.style.display = '';
     if (mainContent) mainContent.style.display = '';
     elemento.style.display = 'none';
-    document.body.style.background = "linear-gradient(180deg, var(--bg-2), var(--bg))";
     if (btn) { btn.textContent = "Tentar Novamente"; btn.style.opacity = "1"; btn.disabled = false; }
   }
 }
