@@ -638,16 +638,21 @@ function finalizarEEnviar() {
   const nomePaciente = document.getElementById("paciente").value || "Paciente_Sem_Nome";
   const elemento = document.getElementById("report");
 
-  // 4. TRUQUE: Torna o relatório visível (atrás da cortina) para a "câmara" conseguir tirar a foto
-  elemento.style.setProperty("display", "block", "important");
-  elemento.style.background = "#fff";
+// 4. TRUQUE: Prende o relatório no canto superior esquerdo com a largura exata de um A4 (800px)
+  elemento.style.cssText = "display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; width: 800px !important; padding: 20px !important; background: #fff !important; z-index: 9990 !important;";
 
-  // 5. Configurações de alta qualidade para o PDF
+  // 5. Configurações exatas para A4 (removemos o 1200 e ajustamos para 800)
   const opt = {
-    margin:       0,
+    margin:       10, // Margem branca de segurança
     filename:     'resultado.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 }, // Mantém o layout de computador intacto
+    html2canvas:  { 
+      scale: 2, 
+      useCORS: true, 
+      scrollX: 0, 
+      scrollY: 0, 
+      windowWidth: 800 // A câmara e o relatório têm agora o mesmo tamanho (A4)
+    }, 
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
