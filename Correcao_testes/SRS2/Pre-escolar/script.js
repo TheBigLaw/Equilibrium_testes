@@ -588,18 +588,40 @@ function finalizarEEnviar() {
 
   const elemento = document.getElementById("report");
   
-  // O GRANDE TRUQUE DO ZOOM OUT (Aumentado para 2400px):
-  // A câmara agora fotografa uma área monstruosa. O PDF será obrigado a encolher as letras de forma muito agressiva para caber na folha!
-  elemento.style.cssText = "display: block !important; margin: 0 auto !important; padding: 100px 150px !important; background: #fff !important; width: 2400px !important; box-sizing: border-box !important;";
+  // 1. OBRIGA A LARGURA A SER 800px (Proporção Exata do A4 sem bugs)
+  elemento.style.cssText = "display: block !important; margin: 0 auto !important; background: #fff !important; width: 800px !important; padding: 0 !important;";
   
-  // Limpa restrições antigas do CSS
-  const repPage = elemento.querySelector('.rep-page');
-  if(repPage) {
-    repPage.style.cssText = "width: 100% !important; min-height: auto !important; padding: 0 !important; margin: 0 !important; box-sizing: border-box !important;";
-  }
-
   const estiloCores = document.createElement('style');
   estiloCores.innerHTML = `
+    /* Trava o container da folha */
+    #report .rep-page { 
+      width: 800px !important; 
+      min-height: 1123px !important; 
+      margin: 0 auto !important; 
+      padding: 40px 50px !important; 
+      box-sizing: border-box !important; 
+    }
+    
+    /* 2. O VERDADEIRO ZOOM OUT: Encolhemos as fontes diretamente! */
+    #report .rep-h1 { font-size: 16px !important; }
+    #report .rep-h2 { font-size: 12px !important; margin-top: 4px !important; }
+    #report .rep-patient { font-size: 11px !important; line-height: 1.3 !important; }
+    
+    #report .rep-block-title { font-size: 12px !important; padding: 4px 8px !important; margin-bottom: 10px !important; }
+    #report .rep-text { font-size: 10.5px !important; line-height: 1.4 !important; }
+    
+    /* Encolhe as tabelas */
+    #report .rep-table { margin-top: 0 !important; }
+    #report .rep-table th, #report .rep-table td { font-size: 10px !important; padding: 5px 8px !important; }
+    
+    #report .rep-mini-table { font-size: 10px !important; width: 320px !important; }
+    #report .rep-mini-table td { padding: 4px 6px !important; }
+    #report .rep-scale-desc { font-size: 10.5px !important; line-height: 1.4 !important; }
+    
+    /* Encolhe os textos dentro dos gráficos SVG */
+    #report svg text { font-size: 10.5px !important; }
+
+    /* Cores das tabelas */
     #report .rep-table th { background-color: #e8fbfa !important; color: #111 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #report .rep-mini-table tr { background-color: #f9fbfb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #report .rep-mini-table tr:nth-child(even) { background-color: #fff !important; }
@@ -611,15 +633,15 @@ function finalizarEEnviar() {
 
   setTimeout(() => {
     const opt = {
-      margin: [15, 0, 15, 0], // Margem de segurança no topo e fundo do PDF
+      margin: [10, 0, 10, 0], // Margem no topo e fundo da página (em mm)
       filename: 'resultado.pdf',
-      image: { type: 'jpeg', quality: 1 },
+      image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2, 
         useCORS: true, 
         scrollX: 0, 
         scrollY: 0,
-        windowWidth: 2400 // Sincronizado para garantir a máxima redução possível na conversão
+        windowWidth: 800 // Sincronizado com os 800px para o PDF sair perfeito
       }, 
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
