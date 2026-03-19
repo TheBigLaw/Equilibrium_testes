@@ -593,3 +593,40 @@ td{
 #report .rep-break-after { page-break-after: always; break-after: page; }
 #report .rep-break-before { page-break-before: always; break-before: page; }
 #report .rep-scale { page-break-inside: avoid; margin-bottom: 40px; display: block; }
+
+/* ========================================================= */
+/* MODO GERAÇÃO PDF SILENCIOSO (CLONE DA IMPRESSÃO PERFEITA) */
+/* ========================================================= */
+body.modo-pdf > :not(#report) { display: none !important; }
+body.modo-pdf { background: #fff !important; margin: 0; padding: 0; overflow: hidden; }
+
+body.modo-pdf #report {
+  display: block !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 794px !important; /* Largura exata da folha A4 */
+  padding: 40px !important; /* Margem interna elegante */
+  box-sizing: border-box !important;
+  background: #fff !important;
+  color: #111 !important;
+  z-index: 10;
+}
+
+/* Clones exatos do seu @media print para as tabelas ficarem perfeitas */
+body.modo-pdf .rep-table { border-collapse: collapse; width: 100%; margin-top: 10px; margin-bottom: 20px;}
+body.modo-pdf .rep-table th, body.modo-pdf .rep-table td { border: none; border-bottom: 1px solid #e0e0e0; padding: 12px 9px; font-size: 10pt; }
+body.modo-pdf .rep-table th { background: transparent; border-bottom: 2px solid #111; text-align: left; font-weight: bold; }
+
+body.modo-pdf .rep-scale-grid { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; margin-top: 10px; width: 100%;}
+body.modo-pdf .rep-scale-grid > div { width: 48%; } 
+body.modo-pdf .rep-mini-table { width: 100%; font-size: 11pt; border-collapse: collapse;}
+body.modo-pdf .rep-mini-table td { padding: 6px 0; border-bottom: 1px solid #f0f5f4;}
+body.modo-pdf .rep-mini-table td:nth-child(2) { text-align: right; font-weight: bold; }
+body.modo-pdf .rep-mini-table tr { background: #f9fbfb; }
+body.modo-pdf .rep-mini-table tr:nth-child(even) { background: #fff; }
+
+body.modo-pdf .rep-h1 { color: #555; font-weight: normal; font-size: 16pt; }
+body.modo-pdf .rep-h2 { font-size: 14pt; font-weight: bold; color: #111; }
+body.modo-pdf .rep-block-title { background: #e8fbfa; padding: 5px 10px; font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
+body.modo-pdf .rep-scale { margin-bottom: 40px; display: block; }
