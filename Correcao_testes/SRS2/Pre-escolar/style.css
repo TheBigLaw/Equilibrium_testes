@@ -521,75 +521,32 @@ td{
 }
 
 /* ========================================= */
-/* ESTILOS DO RELATÓRIO (PDF DEFINITIVO)     */
+/* MODO PDF LIMPO (Acionado pelo JavaScript) */
 /* ========================================= */
 
-#report {
-  display: none;
-  background: #fff;
-  color: #111;
+/* Esconde tudo no site, EXCETO o relatório e a cortina de carregamento */
+body.pdf-mode > :not(#report):not(#cortina-loading) { 
+  display: none !important; 
 }
 
-/* --- Estilo das Tabelas Principais --- */
-#report .rep-table { 
-  border-collapse: collapse; 
-  width: 100%; 
-  margin-top: 10px; 
-}
-#report .rep-table th, #report .rep-table td {
-  border: none;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 12px 9px;
-  font-size: 10pt;
-}
-#report .rep-table th { 
-  background: #e8fbfa !important; /* Fundo verde-água forçado */
-  border-bottom: 2px solid #111; 
-  text-align: left; 
-  font-weight: bold;
+/* Configura a página e o relatório para a foto perfeita */
+body.pdf-mode {
+  background: #fff !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-/* --- Mini Tabelas e Gráficos de Sino Lado a Lado --- */
-#report .rep-scale-grid {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 30px;
-  margin-top: 10px;
-}
-/* OBRIGA a tabela e o gráfico a dividirem o espaço 50/50 */
-#report .rep-scale-grid > div {
-  width: 48%; 
-}
-#report .rep-mini-table { 
-  width: 100%; 
-  font-size: 11pt; 
-  border-collapse: collapse;
-}
-#report .rep-mini-table td { 
-  padding: 6px 0; 
-  border-bottom: 1px solid #f0f5f4;
-}
-#report .rep-mini-table td:nth-child(2) { 
-  text-align: right; 
-  font-weight: bold; 
-}
-#report .rep-mini-table tr { background: #f9fbfb !important; }
-#report .rep-mini-table tr:nth-child(even) { background: #fff !important; }
-
-/* --- Tipografia, Títulos e Quebras de Página --- */
-#report .rep-h1 { color: #555; font-weight: normal; font-size: 16pt; margin-bottom: 5px; }
-#report .rep-h2 { font-size: 14pt; font-weight: bold; color: #111; margin-top: 0; }
-
-#report .rep-block-title { 
-  background: #e8fbfa !important; 
-  padding: 5px 10px; 
-  font-size: 14pt; 
-  font-weight: bold; 
-  text-transform: uppercase; 
-  margin-bottom: 15px; 
+body.pdf-mode #report {
+  display: block !important;
+  width: 794px !important;
+  margin: 0 !important; /* Mantém encostado à esquerda para não cortar */
+  padding: 30px 40px !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
 }
 
-#report .rep-break-after { page-break-after: always; break-after: page; }
-#report .rep-break-before { page-break-before: always; break-before: page; }
-#report .rep-scale { page-break-inside: avoid; margin-bottom: 20px; }
+/* Força as cores verde-água a aparecerem na foto */
+body.pdf-mode .rep-table th { background: #e8fbfa !important; color: #111 !important; }
+body.pdf-mode .rep-mini-table tr { background: #f9fbfb !important; }
+body.pdf-mode .rep-mini-table tr:nth-child(even) { background: #fff !important; }
+body.pdf-mode .rep-block-title { background: #e8fbfa !important; color: #111 !important; }
