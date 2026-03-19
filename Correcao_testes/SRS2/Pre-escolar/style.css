@@ -524,28 +524,33 @@ td{
 /* MODO PDF LIMPO (Acionado pelo JavaScript) */
 /* ========================================= */
 
-/* Esconde tudo no site, EXCETO o relatório e a cortina de carregamento */
-body.pdf-mode > :not(#report):not(#cortina-loading) { 
+/* 1. Esconde as perguntas e os topos, mas NÃO esconde a <main> */
+body.pdf-mode .app-header,
+body.pdf-mode header.no-print,
+body.pdf-mode .grid { 
   display: none !important; 
 }
 
-/* Configura a página e o relatório para a foto perfeita */
-body.pdf-mode {
-  background: #fff !important;
+/* 2. Tira a <main> do centro para a câmara não cortar o lado esquerdo do A4 */
+body.pdf-mode main {
   margin: 0 !important;
   padding: 0 !important;
+  max-width: 100% !important;
 }
+
+/* 3. Configura o fundo e o tamanho perfeito do relatório */
+body.pdf-mode { background: #fff !important; }
 
 body.pdf-mode #report {
   display: block !important;
   width: 794px !important;
-  margin: 0 !important; /* Mantém encostado à esquerda para não cortar */
+  margin: 0 !important; 
   padding: 30px 40px !important;
   background: #fff !important;
   box-sizing: border-box !important;
 }
 
-/* Força as cores verde-água a aparecerem na foto */
+/* 4. Força as cores verde-água a aparecerem na foto do PDF */
 body.pdf-mode .rep-table th { background: #e8fbfa !important; color: #111 !important; }
 body.pdf-mode .rep-mini-table tr { background: #f9fbfb !important; }
 body.pdf-mode .rep-mini-table tr:nth-child(even) { background: #fff !important; }
