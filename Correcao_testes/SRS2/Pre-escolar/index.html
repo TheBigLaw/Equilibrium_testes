@@ -66,49 +66,25 @@
 
       </section>
 
-      <!-- DIREITA: Resultado -->
-      <aside class="card">
-        <h2>Resultados</h2>
+    <!-- RELATÓRIO (SÓ APARECE NA IMPRESSÃO) -->
+<section id="report" class="report">
+  <div class="rep-page">
 
-        <div class="small" id="summaryLine">Preencha os itens e clique em “Recalcular”.</div>
-
-        <div class="table-wrap">
-          <table id="tblResultados">
-            <thead>
-              <tr>
-                <th>Escala</th>
-                <th class="right nowrap">Bruto</th>
-                <th class="right nowrap">T</th>
-                <th class="nowrap">Classificação</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+    <div class="rep-head">
+      <div class="rep-brand">
+        <img class="rep-logo" src="/logo.png" alt="Equilibrium">
+        <div class="rep-head-txt">
+          <div class="rep-h1" id="repTitle">Escala de Responsividade Social - 2</div>
+          <div class="rep-h2" id="repSubTitle">—</div>
         </div>
+      </div>
 
-        <hr class="sep">
-
-        <h2>Detalhe de itens (auditoria)</h2>
-        <div class="small">Conferência: resposta → pontos → reverso.</div>
-
-        <div class="table-wrap maxh">
-          <table id="tblItens">
-            <thead>
-              <tr>
-                <th class="nowrap">Item</th>
-                <th class="nowrap">Resp</th>
-                <th class="right nowrap">Pontos</th>
-                <th class="nowrap">Reverso</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-
-      </aside>
-
+      <div class="rep-patient">
+        <div><span>Paciente:</span> <strong id="repPaciente">—</strong></div>
+        <div><span>Data:</span> <strong id="repData">—</strong></div>
+        <div><span>Avaliador:</span> <strong id="repAvaliador">—</strong></div>
+      </div>
     </div>
-  </main>
 
     <!-- 1) PERFIL -->
     <div class="rep-block">
