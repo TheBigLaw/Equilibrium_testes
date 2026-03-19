@@ -624,7 +624,7 @@ function finalizarEEnviar() {
     btn.disabled = true;
   }
 
-  // 1. Cortina de Carregamento (Agora com ID para o CSS a reconhecer)
+  // A cortina de carregamento roxa (com o ID correto)
   const cortina = document.createElement("div");
   cortina.id = "cortina-loading"; 
   cortina.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f6f3ff; z-index: 999999; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #4c1d95; font-weight: bold; flex-direction: column; gap: 15px;";
@@ -634,11 +634,11 @@ function finalizarEEnviar() {
   const nomePaciente = document.getElementById("paciente").value || "Paciente_Sem_Nome";
   const elemento = document.getElementById("report");
 
-  // 2. O MÉTODO LIMPO: Apenas ligamos a classe no Body e o CSS faz a mágica!
+  // O MÉTODO LIMPO: Ligamos as regras que colocámos no CSS
   document.body.classList.add("pdf-mode");
   window.scrollTo(0, 0);
 
-  // 3. Aguardamos 1.5s e tiramos a foto
+  // Aguardamos 1.5s para as cores e gráficos se desenharem
   setTimeout(() => {
     const opt = {
       margin: 0, 
@@ -650,12 +650,12 @@ function finalizarEEnviar() {
 
     html2pdf().set(opt).from(elemento).outputPdf('datauristring').then(function(pdfBase64) {
       
-      // 4. Foto tirada! Desligamos o Modo PDF e o site volta ao normal.
+      // Foto tirada! O site volta exatamente ao normal
       document.body.classList.remove("pdf-mode");
 
       const base64Limpo = pdfBase64.split(',')[1];
 
-      // 5. Envia para o Drive
+      // Envia para o Drive
       fetch(URL_DO_GOOGLE_SCRIPT, {
         method: "POST",
         body: JSON.stringify({ pdf: base64Limpo, nome: nomePaciente })
@@ -663,7 +663,6 @@ function finalizarEEnviar() {
       .then(res => res.json())
       .then(data => {
         if (data.status === "sucesso") {
-          // Sucesso Total
           document.body.innerHTML = `
             <div style="background: #f6f3ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
               <div style="text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; width: 100%;">
