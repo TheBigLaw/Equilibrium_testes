@@ -520,46 +520,46 @@ td{
   }
 }
 
-/* ================================================== */
-/* ESTILOS DO RELATÓRIO (PDF E FOTOGRAFIA)            */
-/* ================================================== */
+/* ========================================= */
+/* ESTILOS DO RELATÓRIO (PDF DEFINITIVO)     */
+/* ========================================= */
+
 #report {
-  display: none !important; /* Mantém invisível para o paciente */
-  background: #fff !important;
-  color: #111 !important;
+  display: none;
+  background: #fff;
+  color: #111;
 }
 
-/* --- Estilo das Tabelas do PDF --- */
+/* --- Estilo das Tabelas Principais --- */
 #report .rep-table { 
   border-collapse: collapse; 
   width: 100%; 
-  margin-top: 15px; 
-  margin-bottom: 30px;
+  margin-top: 10px; 
 }
 #report .rep-table th, #report .rep-table td {
   border: none;
   border-bottom: 1px solid #e0e0e0;
-  padding: 12px 10px;
+  padding: 12px 9px;
   font-size: 10pt;
 }
 #report .rep-table th { 
-  background: #e8fbfa; 
+  background: #e8fbfa !important; /* Fundo verde-água forçado */
   border-bottom: 2px solid #111; 
   text-align: left; 
   font-weight: bold;
 }
 
-/* --- Mini Tabela (Detalhes da Escala) e Sino --- */
+/* --- Mini Tabelas e Gráficos de Sino Lado a Lado --- */
 #report .rep-scale-grid {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   margin-bottom: 30px;
   margin-top: 10px;
-  width: 100%;
 }
+/* OBRIGA a tabela e o gráfico a dividirem o espaço 50/50 */
 #report .rep-scale-grid > div {
-  width: 48%;
+  width: 48%; 
 }
 #report .rep-mini-table { 
   width: 100%; 
@@ -567,22 +567,22 @@ td{
   border-collapse: collapse;
 }
 #report .rep-mini-table td { 
-  padding: 8px 0; 
+  padding: 6px 0; 
   border-bottom: 1px solid #f0f5f4;
 }
 #report .rep-mini-table td:nth-child(2) { 
   text-align: right; 
   font-weight: bold; 
 }
-#report .rep-mini-table tr { background: #f9fbfb; }
-#report .rep-mini-table tr:nth-child(even) { background: #fff; }
+#report .rep-mini-table tr { background: #f9fbfb !important; }
+#report .rep-mini-table tr:nth-child(even) { background: #fff !important; }
 
-/* --- Tipografia, Cores e Quebras de Página --- */
-#report .rep-h1 { color: #555; font-weight: normal; font-size: 16pt; }
-#report .rep-h2 { font-size: 14pt; font-weight: bold; color: #111; }
+/* --- Tipografia, Títulos e Quebras de Página --- */
+#report .rep-h1 { color: #555; font-weight: normal; font-size: 16pt; margin-bottom: 5px; }
+#report .rep-h2 { font-size: 14pt; font-weight: bold; color: #111; margin-top: 0; }
 
 #report .rep-block-title { 
-  background: #e8fbfa; 
+  background: #e8fbfa !important; 
   padding: 5px 10px; 
   font-size: 14pt; 
   font-weight: bold; 
@@ -592,4 +592,4 @@ td{
 
 #report .rep-break-after { page-break-after: always; break-after: page; }
 #report .rep-break-before { page-break-before: always; break-before: page; }
-#report .rep-scale { page-break-inside: avoid; margin-bottom: 40px; display: block; }
+#report .rep-scale { page-break-inside: avoid; margin-bottom: 20px; }
