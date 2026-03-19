@@ -520,91 +520,76 @@ td{
   }
 }
 
-/* ========================================= */
-/* RELATÓRIO (ESCONDIDO NA TELA NORMAL)      */
-/* ========================================= */
+/* ================================================== */
+/* ESTILOS DO RELATÓRIO (PDF E FOTOGRAFIA)            */
+/* ================================================== */
 #report {
-  display: none !important;
+  display: none !important; /* Mantém invisível para o paciente */
+  background: #fff !important;
+  color: #111 !important;
 }
 
-/* ========================================= */
-/* CONFIGURAÇÕES EXATAS DE IMPRESSÃO (PDF)   */
-/* ========================================= */
-@media print {
-  @page { margin: 15mm; }
-
-  /* 1) Esconde a interface normal do sistema (cabeçalho, botões, formulário) */
-  body > :not(#report) { 
-    display: none !important; 
-  }
-  
-  /* 2) Exibe SOMENTE o relatório mantendo as tabelas alinhadas */
-  #report {
-    display: block !important;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    background: #fff !important;
-    color: #111 !important;
-  }
-
-  /* --- Estilo das Tabelas do PDF --- */
-  .rep-table { 
-    border-collapse: collapse; 
-    width: 60%; 
-    margin-top: 10px; 
-  }
-  .rep-table th, .rep-table td {
-    border: none;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 20px 9px;
-    font-size: 10pt;
-  }
-  .rep-table th { 
-    background: transparent; 
-    border-bottom: 2px solid #111; 
-    text-align: left; 
-    font-weight: bold;
-  }
-  
-  /* --- Mini Tabela (Detalhes da Escala) --- */
-  .rep-scale-grid {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    margin-top: 10px;
-  }
-  .rep-mini-table { 
-    width: 350px; 
-    font-size: 11pt; 
-  }
-  .rep-mini-table td { 
-    padding: 6px 0; 
-  }
-  .rep-mini-table td:nth-child(2) { 
-    text-align: right; 
-    font-weight: bold; 
-  }
-  .rep-mini-table tr { background: #f9fbfb; }
-  .rep-mini-table tr:nth-child(even) { background: #fff; }
-
-  /* --- Tipografia, Cores e Quebras de Página --- */
-  .rep-h1 { color: #555; font-weight: normal; font-size: 16pt; }
-  .rep-h2 { font-size: 14pt; font-weight: bold; color: #111; }
-  
-  .rep-block-title { 
-    background: #e8fbfa; 
-    padding: 5px 10px; 
-    font-size: 14pt; 
-    font-weight: bold; 
-    text-transform: uppercase; 
-    margin-bottom: 15px; 
-  }
-  
-  .rep-break-after { page-break-after: always; break-after: page; }
-  .rep-break-before { page-break-before: always; break-before: page; }
-  
-  .rep-scale { page-break-inside: avoid; margin-bottom: 20px; }
+/* --- Estilo das Tabelas do PDF --- */
+#report .rep-table { 
+  border-collapse: collapse; 
+  width: 100%; 
+  margin-top: 15px; 
+  margin-bottom: 30px;
 }
+#report .rep-table th, #report .rep-table td {
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 12px 10px;
+  font-size: 10pt;
+}
+#report .rep-table th { 
+  background: #e8fbfa; 
+  border-bottom: 2px solid #111; 
+  text-align: left; 
+  font-weight: bold;
+}
+
+/* --- Mini Tabela (Detalhes da Escala) e Sino --- */
+#report .rep-scale-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  margin-top: 10px;
+  width: 100%;
+}
+#report .rep-scale-grid > div {
+  width: 48%;
+}
+#report .rep-mini-table { 
+  width: 100%; 
+  font-size: 11pt; 
+  border-collapse: collapse;
+}
+#report .rep-mini-table td { 
+  padding: 8px 0; 
+  border-bottom: 1px solid #f0f5f4;
+}
+#report .rep-mini-table td:nth-child(2) { 
+  text-align: right; 
+  font-weight: bold; 
+}
+#report .rep-mini-table tr { background: #f9fbfb; }
+#report .rep-mini-table tr:nth-child(even) { background: #fff; }
+
+/* --- Tipografia, Cores e Quebras de Página --- */
+#report .rep-h1 { color: #555; font-weight: normal; font-size: 16pt; }
+#report .rep-h2 { font-size: 14pt; font-weight: bold; color: #111; }
+
+#report .rep-block-title { 
+  background: #e8fbfa; 
+  padding: 5px 10px; 
+  font-size: 14pt; 
+  font-weight: bold; 
+  text-transform: uppercase; 
+  margin-bottom: 15px; 
+}
+
+#report .rep-break-after { page-break-after: always; break-after: page; }
+#report .rep-break-before { page-break-before: always; break-before: page; }
+#report .rep-scale { page-break-inside: avoid; margin-bottom: 40px; display: block; }
