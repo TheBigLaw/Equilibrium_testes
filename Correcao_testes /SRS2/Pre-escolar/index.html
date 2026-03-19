@@ -6,6 +6,8 @@
   <title>Pré-Escolar</title>
   <link rel="stylesheet" href="./style.css?v=20260305">
   <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo_app.png" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <header class="app-header">
@@ -27,7 +29,7 @@
         <span class="pill">Formulário: <strong id="pillForm">—</strong></span>
         <span class="pill">Respondidos: <strong id="pillAnswered">0</strong></span>
         <button class="secondary" id="btnRecalc" type="button">Recalcular</button>
-        <button class="secondary" id="btnPrint" type="button">Imprimir / Salvar PDF</button>
+        <button id="btnEnviar" class="primary" style="background-color: #4c1d95; color: #fff; padding: 14px 24px; font-size: 16px; width: 100%;">Finalizar e Enviar</button>
         <button class="danger" id="btnClear" type="button">Limpar</button>
       </div>
     </div>
