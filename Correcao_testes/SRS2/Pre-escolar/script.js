@@ -576,36 +576,31 @@ function finalizarEEnviar() {
     btn.disabled = true;
   }
 
-  // 1. Cortina roxa de privacidade
   const cortina = document.createElement("div");
   cortina.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f6f3ff; z-index: 999999; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #4c1d95; font-weight: bold; flex-direction: column; gap: 15px;";
   cortina.innerHTML = "<span>⏳ A formatar e enviar o relatório...</span><span style='font-size: 16px; color: #6d28d9;'>Por favor, não feche esta página.</span>";
   document.body.appendChild(cortina);
 
-  // Esconde o site
   const headers = document.querySelectorAll('header');
   const main = document.querySelector('main');
   headers.forEach(h => h.style.display = 'none');
   if(main) main.style.display = 'none';
 
   const elemento = document.getElementById("report");
-  elemento.style.cssText = "display: block !important; margin: 0 !important; padding: 0 !important; background: #fff !important;";
   
-  // 2. O GRANDE TRUQUE CONTRA O ZOOM DO WINDOWS/MAC:
-  // Bloqueamos temporariamente a largura do corpo do site em 800px.
-  const bodyWidthOriginal = document.body.style.width;
-  document.body.style.width = "800px";
+  // O GRANDE TRUQUE DO ZOOM OUT:
+  // Aumentamos a largura do relatório para 1200px. A câmara vai tirar uma foto "larga".
+  // Quando o jsPDF for tentar colocar 1200px num papel A4, ele vai ser obrigado a ENCOLHER a escala de tudo!
+  elemento.style.cssText = "display: block !important; margin: 0 auto !important; padding: 40px 60px !important; background: #fff !important; width: 1200px !important; box-sizing: border-box !important;";
+  
+  // Limpa restrições antigas do CSS para o truque funcionar
+  const repPage = elemento.querySelector('.rep-page');
+  if(repPage) {
+    repPage.style.cssText = "width: 100% !important; min-height: auto !important; padding: 0 !important; margin: 0 !important; box-sizing: border-box !important;";
+  }
 
   const estiloCores = document.createElement('style');
   estiloCores.innerHTML = `
-    /* Sobrepõe os "210mm" do CSS e obriga a folha a ter a largura exata A4 em Pixels */
-    #report .rep-page { 
-      width: 794px !important; 
-      min-height: 1123px !important; 
-      margin: 0 auto !important; 
-      box-sizing: border-box !important;
-    }
-    
     #report .rep-table th { background-color: #e8fbfa !important; color: #111 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #report .rep-mini-table tr { background-color: #f9fbfb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #report .rep-mini-table tr:nth-child(even) { background-color: #fff !important; }
@@ -615,32 +610,27 @@ function finalizarEEnviar() {
 
   window.scrollTo(0, 0);
 
-  // 3. CAPTURA
   setTimeout(() => {
     const opt = {
-      margin: 0,
+      margin: [10, 0, 10, 0], // Dá 10mm de margem em cima e em baixo para a quebra de página ficar bonita
       filename: 'resultado.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg', quality: 1 },
       html2canvas: { 
         scale: 2, 
         useCORS: true, 
         scrollX: 0, 
         scrollY: 0,
-        windowWidth: 800 // Diz à câmara que a tela tem exatos 800px (ignora resoluções gigantes e telemóveis)
+        windowWidth: 1200 // Obriga a câmara a ver a página com 1200px (acionando o encolhimento)
       }, 
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(elemento).outputPdf('datauristring').then(function(pdfBase64) {
       
-      // Devolve a largura do navegador ao normal (o utilizador não nota)
-      document.body.style.width = bodyWidthOriginal;
-
       const base64Limpo = pdfBase64.split(',')[1];
       const inputPaciente = document.getElementById("paciente");
       const nomePaciente = (inputPaciente ? inputPaciente.value : "") || "Paciente_Sem_Nome";
 
-      // 4. ENVIO PARA O DRIVE
       fetch(URL_DO_GOOGLE_SCRIPT, {
         method: "POST",
         body: JSON.stringify({ pdf: base64Limpo, nome: nomePaciente })
