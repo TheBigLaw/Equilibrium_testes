@@ -636,26 +636,36 @@ function finalizarEEnviar() {
   const nomePaciente = document.getElementById("paciente").value || "Paciente_Sem_Nome";
   const elemento = document.getElementById("report");
 
-  // 4. TRUQUE: Torna o relatório visível (atrás da cortina) para a "câmara" conseguir tirar a foto
+// 4. TRUQUE: Torna o relatório visível e FORÇA o tamanho de um ecrã de PC (800px)
   elemento.style.setProperty("display", "block", "important");
   elemento.style.background = "#fff";
+  elemento.style.width = "800px"; // Força a largura exata de uma folha A4
+  elemento.style.maxWidth = "800px";
+  elemento.style.position = "absolute"; 
+  elemento.style.left = "0"; // Prende o relatório à esquerda para não cortar o texto
+  elemento.style.top = "0";
 
-  // 5. Configurações de alta qualidade para o PDF
+  // 5. Configurações de alta qualidade (Agora com margens no próprio gerador)
   const opt = {
-    margin:       0,
+    margin:       15, // Cria 15mm de margem branca perfeita à volta da folha
     filename:     'resultado.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 }, // Mantém o layout de computador intacto
+    html2canvas:  { scale: 2, useCORS: true }, // Retirámos o windowWidth que estava a bugar
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
   // 6. Gera o PDF
   html2pdf().set(opt).from(elemento).outputPdf('datauristring').then(function(pdfBase64) {
     
-    // Esconde o relatório novamente
+    // Esconde o relatório novamente e limpa as medidas que forçámos
     elemento.style.setProperty("display", "none", "important");
+    elemento.style.width = "";
+    elemento.style.maxWidth = "";
+    elemento.style.position = "";
+    elemento.style.left = "";
+    elemento.style.top = "";
 
-    // Prepara os dados
+    // Prepara os dados limpos
     const base64Limpo = pdfBase64.split(',')[1];
 
     // 7. Envia para o Google Drive
