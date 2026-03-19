@@ -1,4 +1,4 @@
-
+// Cole a URL gigante gerada pelo Google Apps Script entre as aspas:
 const URL_DO_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwBUzlAykhgVOjW9HKAKGjXkgnA8SkjRdgGk5CstrM-uMYkSxAbHEQHieb2N29etYY7/exec";
 
 /**
@@ -238,7 +238,6 @@ function calcularEExibir(){
   const tscores = calcularTscores(brutos);
 
   renderTabelaResultados(brutos, tscores);
-  //renderTabelaItens(respostas);
 
   const total = form.items.length;
   const answered = total - missing;
@@ -288,6 +287,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("#btnClear").addEventListener("click", () => {
       limparTudo();
     });
+    
+    // Inicia a escuta do botão de enviar
+    instalarBotaoEnviar();
     instalarPrintComRelatorio();
 
   }catch(err){
@@ -309,7 +311,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 // RELATÓRIO (PRINT) – GERAÇÃO
 // ------------------------------
 
-// Ordem “igual ao PDF” (por label). Ajusta sozinho mesmo se keys mudarem.
 const SCALE_ORDER_HINTS = [
   "Percepção Social",
   "Cognição Social",
@@ -320,7 +321,6 @@ const SCALE_ORDER_HINTS = [
   "Escore Total"
 ];
 
-// Textos descritivos (paráfrase clínica; você pode refinar depois)
 const SCALE_DESCRIPTIONS = {
   "Percepção Social":
     "A Subescala de Intervenção de Percepção Social mede a capacidade de reconhecer pistas sociais e lidar com os aspectos da percepção do comportamento social recíproco.",
@@ -353,7 +353,6 @@ function sortScalesLikePdf(scales){
 function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
 function countMissingByScale(form){
-  // missing por escala = itens sem resposta que pertencem àquela escala
   const missingByScale = {};
   for(const sc of form.scales) missingByScale[sc.key] = 0;
 
@@ -388,7 +387,7 @@ function svgProfileChart(rows){
   const grayLight = "#dcdcdc";
   const grayMed = "#c8c8c8";
 
-  // CORREÇÃO: Removido o height="auto" que destruía o PDF
+  // Gráfico limpo sem height="auto"
   let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg">
     <rect x="0" y="0" width="${W}" height="${H}" fill="#fff"/>`;
 
@@ -461,7 +460,7 @@ function svgBell(t){
 
   const xt = xOfT(t ?? 50);
 
-  // CORREÇÃO: Removido o height="auto"
+  // Gráfico limpo sem height="auto"
   return `
   <svg class="rep-bell" viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg">
     <rect x="0" y="0" width="${W}" height="${H}" fill="#fff"/>
@@ -581,19 +580,29 @@ for(const r of rows){
   document.getElementById("repInterpretation").innerHTML = buildInterpretationText();
 }
 
-// IMPORTANTE: garantir que o botão Print preencha o relatório antes
-// Troque seu handler atual do btnPrint por este:
 function instalarPrintComRelatorio(){
   const btn = document.getElementById("btnPrint");
   if(!btn) return;
 
-btn.addEventListener("click", () => {
-  const result = calcularEExibir();
-  if(result){
-    preencherRelatorioSRS2(result);
+  btn.addEventListener("click", () => {
+    const result = calcularEExibir();
+    if(result){
+      preencherRelatorioSRS2(result);
+    }
+    window.print();
+  });
+}
+
+// ==========================================
+// FUNÇÕES DE ENVIO E FORMATAÇÃO DE PDF FINAL
+// ==========================================
+function instalarBotaoEnviar() {
+  const btnEnviar = document.getElementById("btnEnviar");
+  if (btnEnviar) {
+    btnEnviar.addEventListener("click", () => {
+      finalizarEEnviar();
+    });
   }
-  window.print();
-});
 }
 
 function finalizarEEnviar() {
@@ -613,8 +622,8 @@ function finalizarEEnviar() {
   document.body.appendChild(cortina);
 
   // 2. ISOLAMENTO PERFEITO: 
-  // Escondemos os cabeçalhos e o <main>. Como o #report está FORA do <main>, 
-  // ele assume o ecrã sozinho, colado no topo esquerdo, sem cortes!
+  // Escondemos os cabeçalhos e a <main>. Como o #report está FORA da <main> no HTML, 
+  // ele assume o ecrã sozinho, colado no topo esquerdo, sem cortes laterais!
   const headers = document.querySelectorAll('header');
   const main = document.querySelector('main');
   headers.forEach(h => h.style.display = 'none');
@@ -635,7 +644,7 @@ function finalizarEEnviar() {
 
   window.scrollTo(0, 0);
 
-  // 4. Espera 1.5s para os gráficos desenharem corretamente e tira a foto
+  // 4. Espera 1.5s para os gráficos SVG desenharem corretamente e tira a foto
   setTimeout(() => {
     const opt = {
       margin: 0,
