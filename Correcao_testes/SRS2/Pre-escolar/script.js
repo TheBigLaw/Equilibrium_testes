@@ -301,7 +301,7 @@ const SCALE_DESCRIPTIONS = {
   "Percepção Social": "A Subescala de Intervenção de Percepção Social mede a capacidade de reconhecer pistas sociais e lidar com os aspectos da percepção do comportamento social recíproco.",
   "Cognição Social": "A Subescala de Intervenção Cognição Social refere-se à capacidade de interpretar as pistas sociais após reconhecê-las e lidar com o aspecto cognitivo-interpretativo do comportamento social recíproco.",
   "Comunicação Social": "A Subescala de Intervenção Comunicação Social mede a capacidade de comunicação expressiva, lidando com os aspectos motores do comportamento social recíproco. Esta categoria representa os aspectos \"robotizados\" do comportamento.",
-  "Motivação Social": "A Subescala de Intervenção Motivação Social refere-se ao grau em que as pessoas généralement são motivadas a se engajar em comportamento sócio interpessoal. Elementos de ansiedade social, inibição e orientação empática estão incluídos entre esses itens.",
+  "Motivação Social": "A Subescala de Intervenção Motivação Social refere-se ao grau em que as pessoas geralmente são motivadas a se engajar em comportamento sócio interpessoal. Elementos de ansiedade social, inibição e orientação empática estão incluídos entre esses itens.",
   "Padrões Restritos e Repetitivos": "Padrões Restritos e Repetitivos encontra-se tanto nas subescalas de intervenção quanto nas escalas compatíveis ao DSM-5. Esta categoria mede a presença de comportamentos estereotípicos característicos de TEA e áreas de interesse muito limitadas.",
   "Comunicação e Interação Social": "Comunicação e Interação Social é uma das escalas compatíveis ao DSM-5 e é uma medida global que se relaciona tanto à capacidade de reconhecer e interpretar sinais sociais quanto à capacidade de motivação para o contato interpessoal social expressivo. Ela avalia a reciprocidade socioemocional, comportamentos comunicativos não verbais usados para interação social e capacidade de desenvolver, manter e compreender relacionamentos."
 };
@@ -334,9 +334,13 @@ function countMissingByScale(form){
   return missingByScale;
 }
 
+// ==========================================
+// GRÁFICO SVG COM "TETO" AUMENTADO PARA NÃO CORTAR TEXTO
+// ==========================================
 function svgProfileChart(rows){
-  const W = 920, H = 450;
-  const left = 100, right = 280, top = 40, bottom = 40;
+  const W = 920, H = 480; // Altura aumentada de 450 para 480
+  // Topo (top) aumentado de 40 para 70 para acomodar o texto rodado
+  const left = 110, right = 280, top = 70, bottom = 40; 
   const plotW = W - left - right;
   const plotH = H - top - bottom;
   const tMin = 20, tMax = 80;
@@ -372,8 +376,9 @@ function svgProfileChart(rows){
     svg += `<text x="${x}" y="${top-10}" text-anchor="middle" font-size="12" font-family="Arial" fill="#111">${label}</text>`;
   }
 
-  svg += `<text x="${15}" y="${top-10}" font-size="12" font-family="Arial" font-weight="bold" fill="#111" transform="rotate(-90, 15, ${top-10})">Dados brutos</text>`;
-  svg += `<text x="${35}" y="${top-10}" font-size="12" font-family="Arial" font-weight="bold" fill="#111" transform="rotate(-90, 35, ${top-10})">Normas</text>`;
+  // Texto "Dados" e "Norma" afinados
+  svg += `<text x="${20}" y="${top-10}" font-size="16" font-family="Arial" font-weight="bold" fill="#111" transform="rotate(-90, 20, ${top-10})">Dados</text>`;
+  svg += `<text x="${55}" y="${top-10}" font-size="16" font-family="Arial" font-weight="bold" fill="#111" transform="rotate(-90, 55, ${top-10})">Norma</text>`;
 
   rows.forEach((r,i) => {
     svg += `<line x1="${xOfT(20)}" y1="${yOfI(i)}" x2="${xOfT(80)}" y2="${yOfI(i)}" stroke="#fff" stroke-width="1.5" />`;
@@ -390,8 +395,8 @@ function svgProfileChart(rows){
   rows.forEach((r,i) => {
     const y = yOfI(i);
     const x = xOfT(r.t ?? 50);
-    svg += `<text x="${10}" y="${y+4}" font-size="12" font-family="Arial" fill="#111">${r.bruto ?? "—"}</text>`;
-    svg += `<text x="${30}" y="${y+4}" font-size="12" font-family="Arial" fill="#111">${r.t ?? "—"}</text>`;
+    svg += `<text x="${15}" y="${y+4}" font-size="12" font-family="Arial" fill="#111">${r.bruto ?? "—"}</text>`;
+    svg += `<text x="${45}" y="${y+4}" font-size="12" font-family="Arial" fill="#111">${r.t ?? "—"}</text>`;
     svg += `<circle cx="${x}" cy="${y}" r="6" fill="#e3001b"/>`;
     svg += `<text x="${xOfT(80) + 15}" y="${y+4}" font-size="12" font-family="Arial" font-weight="bold" fill="#111">${escapeHtml(r.label)}</text>`;
   });
@@ -403,7 +408,7 @@ function svgProfileChart(rows){
 function svgBell(t){
   const W=500, H=160;
   const tMin=20, tMax=80;
-  const xPad=20, yPad=20;
+  const xPad=20;
   const plotW = W - xPad*2;
   const baseY = H - 30;
 
@@ -588,54 +593,40 @@ function finalizarEEnviar() {
 
   const elemento = document.getElementById("report");
   
-  // 1. O SEGREDO SEM TELA EM BRANCO: Usamos "margin: 0" em vez de "margin: 0 auto".
-  // Isto faz o relatório colar-se naturalmente à esquerda, impossibilitando o corte!
-  elemento.style.cssText = "display: block !important; margin: 0 !important; background: #fff !important; width: 800px !important; padding: 0 !important;";
+  // O TRUQUE DE ESCALA CORRETO: 
+  // Passamos o relatório para 1000px. Isso força o pdf a diminuir a escala 
+  // para caber na folha A4 (deixando tudo mais pequeno e bonito!)
+  elemento.style.cssText = "display: block !important; margin: 0 !important; background: #fff !important; width: 1000px !important; padding: 0 !important;";
   
   const estiloCores = document.createElement('style');
   estiloCores.innerHTML = `
-    /* Trava o container da folha colado à esquerda */
     #report .rep-page { 
-      width: 800px !important; 
-      min-height: 1123px !important; 
-      margin: 0 !important; /* Garante que fica à esquerda */
-      padding: 40px 50px !important; 
+      width: 1000px !important; 
+      min-height: 1414px !important; /* Proporção matemática do A4 */
+      margin: 0 !important; 
+      padding: 50px 70px !important; /* Margens brancas bonitas */
       box-sizing: border-box !important; 
     }
     
-    /* 2. O VERDADEIRO ZOOM OUT: Encolhemos as fontes diretamente! */
-    #report .rep-h1 { font-size: 16px !important; }
-    #report .rep-h2 { font-size: 12px !important; margin-top: 4px !important; }
-    #report .rep-patient { font-size: 11px !important; line-height: 1.3 !important; }
-    
-    #report .rep-block-title { font-size: 12px !important; padding: 4px 8px !important; margin-bottom: 10px !important; }
-    #report .rep-text { font-size: 10.5px !important; line-height: 1.4 !important; }
-    
-    /* Encolhe as tabelas */
-    #report .rep-table { margin-top: 0 !important; }
-    #report .rep-table th, #report .rep-table td { font-size: 10px !important; padding: 5px 8px !important; }
-    
-    #report .rep-mini-table { font-size: 10px !important; width: 320px !important; }
-    #report .rep-mini-table td { padding: 4px 6px !important; }
-    #report .rep-scale-desc { font-size: 10.5px !important; line-height: 1.4 !important; }
-    
-    /* Encolhe os textos dentro dos gráficos SVG */
-    #report svg text { font-size: 10.5px !important; }
+    /* Proteção de Quebras de Página */
+    .rep-scale { page-break-inside: avoid !important; margin-bottom: 25px !important; }
+    tr, .rep-block-title { page-break-inside: avoid !important; }
 
-    /* Cores das tabelas */
-    #report .rep-table th { background-color: #e8fbfa !important; color: #111 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    /* Força as cores de impressão das mini-tabelas (Sem estragar a tabela principal!) */
     #report .rep-mini-table tr { background-color: #f9fbfb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #report .rep-mini-table tr:nth-child(even) { background-color: #fff !important; }
     #report .rep-block-title { background-color: #e8fbfa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    
+    /* A cor roxa do cabeçalho da sua tabela principal */
+    #report .rep-table th { color: #6d28d9 !important; background-color: transparent !important; }
   `;
   document.head.appendChild(estiloCores);
 
-  // Sobe a página ao topo absoluto para a câmara alinhar
   window.scrollTo(0, 0);
 
   setTimeout(() => {
     const opt = {
-      margin: [10, 0, 10, 0], // Margem no topo e fundo da página (em mm)
+      margin: [15, 0, 15, 0], // Margem top e bottom no PDF
       filename: 'resultado.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
@@ -643,14 +634,26 @@ function finalizarEEnviar() {
         useCORS: true, 
         scrollX: 0, 
         scrollY: 0,
-        x: 0, // Força a câmara a não escorregar para o lado
-        y: 0, 
-        windowWidth: 800 // Sincronizado com os 800px para o PDF sair perfeito
+        x: 0, // Garante que a foto começa exatamente colada à esquerda (Adeus cortes!)
+        y: 0,
+        windowWidth: 1000, // Sincronizado com os 1000px do relatório para criar a escala perfeita
+        width: 1000
       }, 
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
     };
 
-    html2pdf().set(opt).from(elemento).outputPdf('datauristring').then(function(pdfBase64) {
+    // Injeta o cabeçalho e rodapé bonitos de novo
+    html2pdf().set(opt).from(elemento).toPdf().get('pdf').then(function (pdf) {
+      const totalPages = pdf.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(9);
+        pdf.setTextColor(100);
+        pdf.text('Equilibrium • Correção automatizada', 12, pdf.internal.pageSize.getHeight() - 8);
+        pdf.text('Página ' + i, pdf.internal.pageSize.getWidth() - 20, pdf.internal.pageSize.getHeight() - 8);
+      }
+    }).outputPdf('datauristring').then(function(pdfBase64) {
       
       const base64Limpo = pdfBase64.split(',')[1];
       const inputPaciente = document.getElementById("paciente");
