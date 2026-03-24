@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SRS-2 | Equilibrium</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: #f0f4f8;
+      color: #1e293b;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    .shell { max-width: 780px; margin: 0 auto; padding: 32px 16px 60px; }
+
+    /* Cabeçalho */
+    .header {
+      display: flex; align-items: center; gap: 14px;
+      background: #fff; border-radius: 16px; padding: 18px 24px;
+      box-shadow: 0 1px 8px rgba(0,0,0,.07); margin-bottom: 28px;
+    }
+    .header img { height: 38px; }
+    .header-brand-name { font-weight: 800; font-size: 16px; color: #1e293b; }
+    .header-brand-sub  { font-size: 11px; color: #64748b; }
+
+    /* Título */
+    .page-heading { margin-bottom: 20px; }
+    .page-heading h1 { font-size: 22px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+    .page-heading p  { font-size: 14px; color: #64748b; }
+
+    /* Banner */
+    .info-banner {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 1.5px solid #bae6fd; border-radius: 14px;
+      padding: 18px 22px; margin-bottom: 24px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .info-banner-icon { font-size: 26px; flex-shrink: 0; }
+    .info-banner-text { font-size: 13px; color: #374151; line-height: 1.65; }
+    .info-banner-text strong { color: #0369a1; }
+
+    /* Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+
+    /* Cards */
+    .cat-card {
+      background: #fff; border-radius: 16px; border: 2px solid transparent;
+      box-shadow: 0 2px 10px rgba(0,0,0,.07); overflow: hidden;
+      text-decoration: none; display: block;
+      transition: transform .18s, box-shadow .18s, border-color .18s;
+    }
+    .cat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.12); }
+    .cat-bar  { height: 7px; width: 100%; }
+    .cat-body { padding: 20px 22px; }
+    .cat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; }
+    .cat-name  { font-size: 15px; font-weight: 800; margin-bottom: 5px; }
+    .cat-desc  { font-size: 12.5px; color: #64748b; margin-bottom: 14px; line-height: 1.5; }
+    .cat-badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+
+    /* Cores */
+    .c-pre  .cat-bar  { background:#0ea5e9; } .c-pre  .cat-icon { background:#e0f2fe; } .c-pre  .cat-name { color:#0369a1; } .c-pre  .cat-badge { background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; } .c-pre:hover  { border-color:#0ea5e9; }
+    .c-ef   .cat-bar  { background:#8b5cf6; } .c-ef   .cat-icon { background:#ede9fe; } .c-ef   .cat-name { color:#6d28d9; } .c-ef   .cat-badge { background:#ede9fe; color:#6d28d9; border:1px solid #ddd6fe; } .c-ef:hover   { border-color:#8b5cf6; }
+    .c-em   .cat-bar  { background:#3b82f6; } .c-em   .cat-icon { background:#dbeafe; } .c-em   .cat-name { color:#1d4ed8; } .c-em   .cat-badge { background:#dbeafe; color:#1d4ed8; border:1px solid #bfdbfe; } .c-em:hover   { border-color:#3b82f6; }
+    .c-ahet .cat-bar  { background:#10b981; } .c-ahet .cat-icon { background:#d1fae5; } .c-ahet .cat-name { color:#047857; } .c-ahet .cat-badge { background:#d1fae5; color:#047857; border:1px solid #a7f3d0; } .c-ahet:hover { border-color:#10b981; }
+    .c-auto .cat-bar  { background:#f59e0b; } .c-auto .cat-icon { background:#fef3c7; } .c-auto .cat-name { color:#b45309; } .c-auto .cat-badge { background:#fef3c7; color:#b45309; border:1px solid #fde68a; } .c-auto:hover { border-color:#f59e0b; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="header">
+      <img src="logo2.png" alt="Equilibrium" onerror="this.style.display='none'">
+      <div>
+        <div class="header-brand-name">Equilibrium</div>
+        <div class="header-brand-sub">Neuropsicologia</div>
+      </div>
+    </div>
+
+    <div class="page-heading">
+      <h1>SRS-2 — Escala de Responsividade Social</h1>
+      <p>Selecione o formulário adequado à faixa etária e tipo de informante.</p>
+    </div>
+
+    <div class="info-banner">
+      <div class="info-banner-icon">🧠</div>
+      <div class="info-banner-text">
+        A <strong>SRS-2</strong> avalia a presença e gravidade de prejuízos na interação social recíproca associados ao
+        <strong>Transtorno do Espectro Autista (TEA)</strong>. Por favor, responda todos os itens com base no comportamento habitual da pessoa avaliada.
+      </div>
+    </div>
+
+    <div class="grid">
+      <a class="cat-card c-pre" href="Pre-escolar/">
+        <div class="cat-bar"></div>
+        <div class="cat-body">
+          <div class="cat-icon">🌱</div>
+          <div class="cat-name">Pré-Escolar</div>
+          <div class="cat-desc">Para crianças em idade pré-escolar. Respondido por pais ou cuidadores.</div>
+          <span class="cat-badge">2a 5m – 4a 5m</span>
+        </div>
+      </a>
+      <a class="cat-card c-ef" href="idade-escolar-feminino/">
+        <div class="cat-bar"></div>
+        <div class="cat-body">
+          <div class="cat-icon">👧</div>
+          <div class="cat-name">Idade Escolar — Feminino</div>
+          <div class="cat-desc">Para crianças e adolescentes do sexo feminino em idade escolar.</div>
+          <span class="cat-badge">4 – 18 anos</span>
+        </div>
+      </a>
+      <a class="cat-card c-em" href="idade-escolar-masculino/">
+        <div class="cat-bar"></div>
+        <div class="cat-body">
+          <div class="cat-icon">👦</div>
+          <div class="cat-name">Idade Escolar — Masculino</div>
+          <div class="cat-desc">Para crianças e adolescentes do sexo masculino em idade escolar.</div>
+          <span class="cat-badge">4 – 18 anos</span>
+        </div>
+      </a>
+      <a class="cat-card c-ahet" href="adulto-heterorelato/">
+        <div class="cat-bar"></div>
+        <div class="cat-body">
+          <div class="cat-icon">👥</div>
+          <div class="cat-name">Adulto — Heterorrelato</div>
+          <div class="cat-desc">Respondido por uma terceira pessoa que conhece bem o avaliado.</div>
+          <span class="cat-badge">19 – 65 anos</span>
+        </div>
+      </a>
+      <a class="cat-card c-auto" href="adulto-autorelato/">
+        <div class="cat-bar"></div>
+        <div class="cat-body">
+          <div class="cat-icon">🙋</div>
+          <div class="cat-name">Adulto — Autorrelato</div>
+          <div class="cat-desc">Respondido pelo próprio avaliado sobre si mesmo.</div>
+          <span class="cat-badge">19 – 65 anos</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
