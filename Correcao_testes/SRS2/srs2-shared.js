@@ -1,13 +1,17 @@
 /**
  * SRS-2 SHARED SCRIPT — Equilibrium
- * Variável FORM_KEY e SRS_ACCENT_VAR devem ser definidas antes deste script em cada página.
- * 
- * FORM_KEY: "pre_escolar" | "idade_escolar_feminino" | "idade_escolar_masculino" | "adulto_autorrelato" | "adulto_heterorrelato"
- * SRS_ACCENT_VAR: "--srs-pre-escolar" | "--srs-escolar-f" | "--srs-escolar-m" | "--srs-adulto-het" | "--srs-adulto-auto"
+ * Variáveis a definir em cada página ANTES deste script:
+ *   FORM_KEY        : "pre_escolar" | "idade_escolar_feminino" | ...
+ *   SRS_ACCENT_VAR  : "--srs-pre-escolar" | ...
+ *   DATA_PATH       : caminho para srs2_rules.json (opcional)
+ *   URL_DO_GOOGLE_SCRIPT : URL do Apps Script para envio ao Drive
  */
 
 let SRS2_RULES = null;
 const $ = (sel) => document.querySelector(sel);
+
+// Caminho para o JSON — pode ser sobrescrito em cada index.html
+if (typeof DATA_PATH === "undefined") { var DATA_PATH = "../data/srs2_rules.json"; }
 
 // ─── INICIALIZAÇÃO DAS CORES ─────────────────────────────────────────────────
 function aplicarAcento(){
@@ -45,9 +49,22 @@ function setSubtitle(msg){
 
 // ─── CARREGAR JSON ────────────────────────────────────────────────────────────
 async function carregarRegras(){
-  const res = await fetch("../data/srs2_rules.json", { cache: "no-store" });
-  if(!res.ok) throw new Error("Não foi possível carregar ../data/srs2_rules.json");
-  SRS2_RULES = await res.json();
+  const path = (typeof DATA_PATH !== "undefined") ? DATA_PATH : "../data/srs2_rules.json";
+  let res;
+  try {
+    res = await fetch(path, { cache: "no-store" });
+  } catch(netErr) {
+    throw new Error("Falha de rede ao carregar dados: " + path + "\n" + netErr.message);
+  }
+  if(!res.ok) throw new Error("Ficheiro não encontrado (" + res.status + "): " + path);
+  try {
+    SRS2_RULES = await res.json();
+  } catch(jsonErr) {
+    throw new Error("JSON inválido em: " + path + "\n" + jsonErr.message);
+  }
+  if(!SRS2_RULES || !Array.isArray(SRS2_RULES.forms)) {
+    throw new Error("Formato inesperado em srs2_rules.json — campo 'forms' não encontrado.");
+  }
 }
 
 function getForm(){
@@ -59,15 +76,18 @@ function getForm(){
 function renderItens(){
   const form = getForm();
   const container = $("#itens");
+  if(!container) return;
   container.innerHTML = "";
 
   if(!form){
-    container.innerHTML = `<div class="srs-hint">FORM_KEY inválida: <b>${escapeHtml(FORM_KEY)}</b></div>`;
+    container.innerHTML = `<div class="srs-hint" style="color:#dc2626">⚠️ Não foi possível carregar os dados do formulário.<br>Verifique se o ficheiro <b>data/srs2_rules.json</b> está acessível.</div>`;
     return;
   }
 
-  $("#pillForm").textContent = form.label || FORM_KEY;
-  $("#hintForm").textContent = `${form.items.length} itens • ${form.scales.length} escalas`;
+  const pillForm = $("#pillForm");
+  if(pillForm) pillForm.textContent = form.label || FORM_KEY;
+  const hintForm = $("#hintForm");
+  if(hintForm) hintForm.textContent = `${form.items.length} itens • ${form.scales.length} escalas`;
 
   const labels = form.answer_labels || { 1:"Nunca", 2:"Às vezes", 3:"Frequentemente", 4:"Quase sempre" };
   const optLabels = { 1: "Nunca", 2: "Às vezes", 3: "Frequentemente", 4: "Quase sempre" };
@@ -142,6 +162,7 @@ function pontosItem(item, resp14){
 
 function coletarRespostas(){
   const form = getForm();
+  if(!form) return { respostas: {}, missing: 0 };
   const map = {}; let missing = 0;
   for(const item of form.items){
     const el = document.querySelector(`input[name="i${CSS.escape(String(item.id))}"]:checked`);
@@ -153,6 +174,7 @@ function coletarRespostas(){
 
 function calcularBrutos(respostasMap){
   const form = getForm();
+  if(!form) return {};
   const brutos = {};
   for(const scale of form.scales) brutos[scale.key] = 0;
   for(const item of form.items){
@@ -169,6 +191,7 @@ function calcularBrutos(respostasMap){
 
 function calcularTscores(brutos){
   const form = getForm();
+  if(!form) return {};
   const ts = {};
   for(const scale of form.scales){
     const bruto = brutos[scale.key];
@@ -183,7 +206,9 @@ function calcularTscores(brutos){
 // ─── TABELAS DE RESULTADO (SIDEBAR) ──────────────────────────────────────────
 function renderTabelaResultados(brutos, tscores){
   const form = getForm();
+  if(!form) return;
   const tbody = $("#tblResultados tbody");
+  if(!tbody) return;
   tbody.innerHTML = "";
 
   for(const scale of form.scales){
@@ -206,7 +231,9 @@ function renderTabelaResultados(brutos, tscores){
 
 function renderTabelaItens(respostasMap){
   const form = getForm();
+  if(!form) return;
   const tbody = $("#tblItens tbody");
+  if(!tbody) return;
   tbody.innerHTML = "";
   for(const item of form.items){
     const resp = respostasMap[item.id];
