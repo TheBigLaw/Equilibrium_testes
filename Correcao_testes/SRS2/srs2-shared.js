@@ -335,82 +335,78 @@ function countMissingByScale(form){
 
 // ─── SVG: Perfil ─────────────────────────────────────────────────────────────
 function svgProfileChart(rows){
-  const W=720, H=320;
-  const left=100, right=260, top=50, bottom=40;
-  const plotW=W-left-right, plotH=H-top-bottom;
-  const tMin=20, tMax=80;
+  /* Dimensões fixas para html2canvas — largura <= 720px (cabe em A4 com padding) */
+  const rowH = 46;
+  const left = 90, right = 225, top = 52, bottom = 16;
+  const plotH = Math.max(rows.length * rowH, 60);
+  const W = 720, H = top + plotH + bottom;
+  const plotW = W - left - right;
+  const tMin = 20, tMax = 80;
 
-  // Usa CSS variables para respeitar o tema
-  const accent = getComputedStyle(document.documentElement).getPropertyValue('--srs-accent').trim() || '#1a56db';
+  const accent      = getComputedStyle(document.documentElement).getPropertyValue('--srs-accent').trim()       || '#1a56db';
   const accentLight = getComputedStyle(document.documentElement).getPropertyValue('--srs-accent-light').trim() || '#dbeafe';
 
-  function xOfT(t){ return left+((clamp(Number(t),tMin,tMax)-tMin)/(tMax-tMin))*plotW; }
-  const yStep = plotH/Math.max(1,rows.length);
-  function yOfI(i){ return top+(i+0.5)*yStep; }
+  function xOfT(t){ return left + ((clamp(Number(t), tMin, tMax) - tMin) / (tMax - tMin)) * plotW; }
+  function yOfI(i){ return top + (i + 0.5) * rowH; }
 
-  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="font-family:sans-serif">
-    <rect x="0" y="0" width="${W}" height="${H}" fill="#fff" rx="12"/>`;
+  /* SVG com dimensões absolutas — html2canvas captura correctamente */
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:Arial,sans-serif;display:block">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="#fff" rx="10"/>`;
 
-  // Fundo da área de plot
-  svg += `<rect x="${xOfT(20)}" y="${top}" width="${xOfT(80)-xOfT(20)}" height="${plotH}" fill="#f8fafc" rx="4"/>`;
+  /* Fundo da área de plot */
+  svg += `<rect x="${xOfT(20)}" y="${top}" width="${xOfT(80)-xOfT(20)}" height="${plotH}" fill="#f8fafc" rx="3"/>`;
 
-  // Zona Normal (40-60) destacada
+  /* Zona Normal (40-60) */
   svg += `<rect x="${xOfT(40)}" y="${top}" width="${xOfT(60)-xOfT(40)}" height="${plotH}" fill="${accentLight}" opacity="0.5" rx="2"/>`;
-  
-  // Zonas de alerta
+  /* Zonas de alerta */
   svg += `<rect x="${xOfT(60)}" y="${top}" width="${xOfT(65)-xOfT(60)}" height="${plotH}" fill="#fef9c3" opacity="0.7"/>`;
   svg += `<rect x="${xOfT(65)}" y="${top}" width="${xOfT(75)-xOfT(65)}" height="${plotH}" fill="#fed7aa" opacity="0.7"/>`;
   svg += `<rect x="${xOfT(75)}" y="${top}" width="${xOfT(80)-xOfT(75)}" height="${plotH}" fill="#fecaca" opacity="0.7"/>`;
 
-  // Linhas verticais de grade
-  for(let t=20;t<=80;t+=5){
-    const x=xOfT(t);
-    svg += `<line x1="${x}" y1="${top}" x2="${x}" y2="${top+plotH}" stroke="#e2e8f0" stroke-width="1.5"/>`;
-    let lbl = String(t);
-    if(t===50) lbl = "50 (M)";
-    svg += `<text x="${x}" y="${top-12}" text-anchor="middle" font-size="11" fill="#64748b" font-weight="${t===50?'700':'400'}">${lbl}</text>`;
+  /* Linhas verticais + labels de score T */
+  for(let t = 20; t <= 80; t += 5){
+    const x = xOfT(t);
+    svg += `<line x1="${x}" y1="${top}" x2="${x}" y2="${top+plotH}" stroke="#e2e8f0" stroke-width="1.2"/>`;
+    const lbl = t === 50 ? "50 (M)" : String(t);
+    svg += `<text x="${x}" y="${top-14}" text-anchor="middle" font-size="10" fill="#64748b" font-weight="${t===50?'700':'400'}">${lbl}</text>`;
   }
 
-  // Labels de zona
-  svg += `<text x="${xOfT(50)}" y="${top-28}" text-anchor="middle" font-size="10" fill="${accent}" font-weight="700">NORMAL</text>`;
-  svg += `<text x="${xOfT(62)}" y="${top-28}" text-anchor="middle" font-size="10" fill="#a16207" font-weight="700">LEVE</text>`;
-  svg += `<text x="${xOfT(70)}" y="${top-28}" text-anchor="middle" font-size="10" fill="#c2410c" font-weight="700">MOD</text>`;
-  svg += `<text x="${xOfT(77)}" y="${top-28}" text-anchor="middle" font-size="10" fill="#991b1b" font-weight="700">SEV</text>`;
+  /* Labels de zona */
+  svg += `<text x="${xOfT(50)}" y="${top-28}" text-anchor="middle" font-size="9" fill="${accent}" font-weight="700">NORMAL</text>`;
+  svg += `<text x="${xOfT(62)}" y="${top-28}" text-anchor="middle" font-size="9" fill="#a16207" font-weight="700">LEVE</text>`;
+  svg += `<text x="${xOfT(70)}" y="${top-28}" text-anchor="middle" font-size="9" fill="#c2410c" font-weight="700">MOD</text>`;
+  svg += `<text x="${xOfT(77)}" y="${top-28}" text-anchor="middle" font-size="9" fill="#991b1b" font-weight="700">SEV</text>`;
 
-  // Headers laterais
-  svg += `<text x="10" y="${top-12}" font-size="10" fill="#64748b" font-weight="700">Bruto</text>`;
-  svg += `<text x="48" y="${top-12}" font-size="10" fill="#64748b" font-weight="700">T</text>`;
+  /* Headers de coluna esquerda */
+  svg += `<text x="8"  y="${top-14}" font-size="10" fill="#64748b" font-weight="700">Bruto</text>`;
+  svg += `<text x="52" y="${top-14}" font-size="10" fill="#64748b" font-weight="700">T</text>`;
 
-  // Linhas horizontais de separação
-  rows.forEach((_,i)=>{
-    svg += `<line x1="${xOfT(20)}" y1="${yOfI(i)+yStep/2}" x2="${xOfT(80)}" y2="${yOfI(i)+yStep/2}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>`;
+  /* Linhas horizontais separadoras */
+  rows.forEach((_, i) => {
+    svg += `<line x1="${xOfT(20)}" y1="${yOfI(i)+rowH/2}" x2="${xOfT(80)}" y2="${yOfI(i)+rowH/2}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>`;
   });
 
-  // Linha conectando pontos
+  /* Linha conectora dos pontos */
   let path = "";
-  rows.forEach((r,i)=>{
-    const x=xOfT(r.t??50), y=yOfI(i);
-    path += (i===0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
+  rows.forEach((r, i) => {
+    const x = xOfT(r.t ?? 50), y = yOfI(i);
+    path += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
   });
-  svg += `<path d="${path}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  svg += `<path d="${path}" fill="none" stroke="${accent}" stroke-width="2" stroke-linejoin="round"/>`;
 
-  // Pontos e labels
-  rows.forEach((r,i)=>{
-    const y=yOfI(i), x=xOfT(r.t??50);
-    const t = r.t==null ? null : Number(r.t);
-    const color = t==null ? '#94a3b8' : t<=59 ? '#16a34a' : t<=65 ? '#d97706' : t<=75 ? '#ea580c' : '#dc2626';
+  /* Pontos, valores e labels de escala */
+  rows.forEach((r, i) => {
+    const y = yOfI(i), x = xOfT(r.t ?? 50);
+    const t = r.t == null ? null : Number(r.t);
+    const color = t == null ? '#94a3b8' : t <= 59 ? '#16a34a' : t <= 65 ? '#d97706' : t <= 75 ? '#ea580c' : '#dc2626';
 
-    // Valores numéricos
-    svg += `<text x="10" y="${y+4}" font-size="11" fill="#374151" font-weight="700">${r.bruto??'—'}</text>`;
-    svg += `<text x="48" y="${y+4}" font-size="11" fill="#374151" font-weight="700">${r.t??'—'}</text>`;
+    svg += `<text x="8"  y="${y+4}" font-size="11" fill="#374151" font-weight="700">${r.bruto ?? '—'}</text>`;
+    svg += `<text x="52" y="${y+4}" font-size="11" fill="#374151" font-weight="700">${r.t ?? '—'}</text>`;
+    svg += `<circle cx="${x}" cy="${y}" r="6" fill="${color}" stroke="#fff" stroke-width="2"/>`;
+    svg += `<circle cx="${x}" cy="${y}" r="2.5" fill="#fff"/>`;
 
-    // Ponto colorido
-    svg += `<circle cx="${x}" cy="${y}" r="7" fill="${color}" stroke="#fff" stroke-width="2"/>`;
-    svg += `<circle cx="${x}" cy="${y}" r="3" fill="#fff"/>`;
-
-    // Nome à direita
-    const label = r.label.length > 30 ? r.label.slice(0,28)+'…' : r.label;
-    svg += `<text x="${xOfT(80)+14}" y="${y+4}" font-size="12" fill="#1e293b" font-weight="700">${escapeHtml(label)}</text>`;
+    const label = r.label.length > 28 ? r.label.slice(0, 26) + '…' : r.label;
+    svg += `<text x="${xOfT(80)+12}" y="${y+4}" font-size="11" fill="#1e293b" font-weight="700">${escapeHtml(label)}</text>`;
   });
 
   svg += `</svg>`;
@@ -419,42 +415,47 @@ function svgProfileChart(rows){
 
 // ─── SVG: Sino ───────────────────────────────────────────────────────────────
 function svgBell(t){
-  const W=420, H=130;
-  const tMin=20, tMax=80;
-  const xPad=20, baseY=H-28, plotW=W-xPad*2;
+  /* Dimensões fixas para html2canvas */
+  const W = 280, H = 120;
+  const tMin = 20, tMax = 80;
+  const xPad = 14, baseY = H - 26, plotW = W - xPad * 2;
 
-  const accent = getComputedStyle(document.documentElement).getPropertyValue('--srs-accent').trim() || '#1a56db';
+  const accent      = getComputedStyle(document.documentElement).getPropertyValue('--srs-accent').trim()       || '#1a56db';
   const accentLight = getComputedStyle(document.documentElement).getPropertyValue('--srs-accent-light').trim() || '#dbeafe';
 
-  function xOfT(val){ return xPad+((clamp(Number(val),tMin,tMax)-tMin)/(tMax-tMin))*plotW; }
+  function xOfT(val){ return xPad + ((clamp(Number(val), tMin, tMax) - tMin) / (tMax - tMin)) * plotW; }
 
   const pts = [];
-  for(let i=0;i<=80;i++){
-    const u=i/80, x=xPad+u*plotW;
-    const y = baseY - Math.exp(-Math.pow((u-0.5)/0.22,2))*90;
-    pts.push([x,y]);
+  for(let i = 0; i <= 80; i++){
+    const u = i / 80, x = xPad + u * plotW;
+    const y = baseY - Math.exp(-Math.pow((u - 0.5) / 0.22, 2)) * 76;
+    pts.push([x, y]);
   }
-  const d = pts.map((p,i)=>(i===0?`M ${p[0]} ${p[1]}`:`L ${p[0]} ${p[1]}`)).join(" ")
-    + ` L ${xPad+plotW} ${baseY} L ${xPad} ${baseY} Z`;
+  const d = pts.map((p, i) => (i === 0 ? `M ${p[0]} ${p[1]}` : `L ${p[0]} ${p[1]}`)).join(" ")
+    + ` L ${xPad + plotW} ${baseY} L ${xPad} ${baseY} Z`;
 
   const tv = t ?? 50;
   const xt = xOfT(tv);
-  const color = tv<=59 ? '#16a34a' : tv<=65 ? '#d97706' : tv<=75 ? '#ea580c' : '#dc2626';
+  const color = tv <= 59 ? '#16a34a' : tv <= 65 ? '#d97706' : tv <= 75 ? '#ea580c' : '#dc2626';
 
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
-    <rect width="${W}" height="${H}" fill="#fff" rx="8"/>
+  /* Label T= colocado DENTRO do SVG (não acima) para não ser cortado */
+  const labelY = Math.max(baseY - 78, 14);
+
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" style="display:block">
+    <rect width="${W}" height="${H}" fill="#fff" rx="6"/>
     <path d="${d}" fill="${accentLight}" opacity="0.6"/>
-    <rect x="${xOfT(40)}" y="${baseY-90}" width="${xOfT(60)-xOfT(40)}" height="90" fill="${accent}" opacity="0.12" rx="2"/>
-    <line x1="${xt}" y1="${baseY-90}" x2="${xt}" y2="${baseY}" stroke="${color}" stroke-width="2.5"/>
-    <circle cx="${xt}" cy="${baseY-90}" r="5" fill="${color}"/>
-    <circle cx="${xt}" cy="${baseY-90}" r="2" fill="#fff"/>
-    <line x1="${xPad}" y1="${baseY}" x2="${xPad+plotW}" y2="${baseY}" stroke="#94a3b8" stroke-width="1.5"/>
-    ${[20,30,40,50,60,70,80].map(v=>`
-      <text x="${xOfT(v)}" y="${baseY+16}" text-anchor="middle" font-size="10" fill="#64748b">${v}</text>
+    <rect x="${xOfT(40)}" y="${baseY-76}" width="${xOfT(60)-xOfT(40)}" height="76" fill="${accent}" opacity="0.10" rx="2"/>
+    <line x1="${xt}" y1="${baseY-76}" x2="${xt}" y2="${baseY}" stroke="${color}" stroke-width="2"/>
+    <circle cx="${xt}" cy="${baseY-76}" r="4" fill="${color}"/>
+    <circle cx="${xt}" cy="${baseY-76}" r="1.5" fill="#fff"/>
+    <line x1="${xPad}" y1="${baseY}" x2="${xPad+plotW}" y2="${baseY}" stroke="#94a3b8" stroke-width="1.2"/>
+    ${[20,30,40,50,60,70,80].map(v => `
+      <text x="${xOfT(v)}" y="${baseY+14}" text-anchor="middle" font-size="9" fill="#64748b">${v}</text>
     `).join("")}
-    <text x="${xt}" y="${baseY-100}" text-anchor="middle" font-size="9" fill="${color}" font-weight="800">T=${tv??'—'}</text>
+    <text x="${xt}" y="${labelY}" text-anchor="middle" font-size="11" fill="${color}" font-weight="800">T=${tv}</text>
   </svg>`;
 }
+
 
 // ─── TEXTOS ───────────────────────────────────────────────────────────────────
 function buildInterpretation(){
@@ -736,6 +737,23 @@ async function finalizarEEnviar() {
   ].join(";");
 
   captureWrap.innerHTML = repFrame.innerHTML;
+
+  /* Injectar CSS variables resolvidas inline para garantir que o captureWrap
+     herda correctamente as cores mesmo fora do contexto normal do DOM */
+  const root = document.documentElement;
+  const cs   = getComputedStyle(root);
+  const inlineVars = [
+    '--srs-accent','--srs-accent-light','--srs-accent-dark',
+    '--text','--text-secondary','--bg','--border','--blue-mid'
+  ].map(v => `${v}:${cs.getPropertyValue(v).trim()}`).join(';');
+  captureWrap.style.setProperty('--srs-accent',      cs.getPropertyValue('--srs-accent').trim());
+  captureWrap.style.setProperty('--srs-accent-light', cs.getPropertyValue('--srs-accent-light').trim());
+  captureWrap.style.setProperty('--srs-accent-dark',  cs.getPropertyValue('--srs-accent-dark').trim());
+  captureWrap.style.setProperty('--text',              '#1e293b');
+  captureWrap.style.setProperty('--text-secondary',    '#64748b');
+  captureWrap.style.setProperty('--bg',                '#f8fafc');
+  captureWrap.style.setProperty('--border',            '#e2e8f0');
+
   document.body.appendChild(captureWrap);
 
   // Pausa para o browser calcular layout (scrollHeight) do captureWrap
