@@ -335,7 +335,7 @@ function countMissingByScale(form){
 
 // ─── SVG: Perfil ─────────────────────────────────────────────────────────────
 function svgProfileChart(rows){
-  const W=720, H=200;
+  const W=720, H=320;
   const left=100, right=260, top=50, bottom=40;
   const plotW=W-left-right, plotH=H-top-bottom;
   const tMin=20, tMax=80;
@@ -419,7 +419,7 @@ function svgProfileChart(rows){
 
 // ─── SVG: Sino ───────────────────────────────────────────────────────────────
 function svgBell(t){
-  const W=500, H=160;
+  const W=420, H=130;
   const tMin=20, tMax=80;
   const xPad=20, baseY=H-28, plotW=W-xPad*2;
 
