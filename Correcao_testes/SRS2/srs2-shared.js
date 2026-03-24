@@ -550,7 +550,7 @@ function abrirRelatorio(result){
   <div class="rep-wrapper">
     <div class="rep-header">
       <div class="rep-header-brand">
-        <img src="/Equilibrium_testes/logo.png" alt="Equilibrium" class="rep-logo">
+        <img src="../logo.png" alt="Equilibrium" class="rep-logo">
         <div>
           <div class="rep-brand-name">Equilibrium</div>
           <div class="rep-brand-sub">Neuropsicologia</div>
@@ -704,16 +704,10 @@ async function finalizarEEnviar() {
   const result = calcularEExibir();
   if (!result) return;
 
-  // 2. Preencher o relatório no overlay oculto (srs2-shared abrirRelatorio)
-  //    Chamamos internamente sem exibir o overlay ao paciente.
   const form = getForm();
   if (!form) return;
 
-  // Chamada interna de abrirRelatorio sem mostrar overlay
-  // (a função adiciona classe "ativo", mas o overlay está com display:none no CSS de paciente)
-  abrirRelatorio(result);
-
-  // 3. Desativar botão e mostrar máscara
+  // 2. Mostrar máscara PRIMEIRO (cobre o ecrã, z-index 999999)
   const btnEnviar = document.getElementById("btnEnviar");
   if (btnEnviar) { btnEnviar.disabled = true; btnEnviar.textContent = "A processar…"; }
 
@@ -725,30 +719,60 @@ async function finalizarEEnviar() {
     <div class="cortina-msg">A processar as suas respostas…</div>
     <div class="cortina-sub">Por favor, não feche esta página.</div>
   `;
+  // Garantir z-index alto o suficiente para tapar tudo
+  cortina.style.zIndex = "999999";
   document.body.appendChild(cortina);
 
-  // 4. Extrair HTML do relatório gerado
+  // Pequena pausa para o browser pintar a cortina antes de continuar
+  await new Promise(r => setTimeout(r, 80));
+
+  // 3. Gerar HTML do relatório
+  abrirRelatorio(result);
   const repFrame = document.querySelector("#repOverlay .srs-report-frame");
   if (!repFrame || !repFrame.innerHTML.trim()) {
-    cortina.innerHTML = `<div class="cortina-msg" style="color:#dc2626">Erro ao gerar relatório. Tente novamente.</div>`;
+    cortina.innerHTML = `<div class="cortina-msg" style="color:#dc2626">Erro ao gerar relatório.<br>Tente novamente.</div>`;
     if (btnEnviar) { btnEnviar.disabled = false; btnEnviar.textContent = "📤 Enviar Respostas"; }
     setTimeout(() => cortina.remove(), 3000);
     return;
   }
 
-  // 5. Criar container temporário para html2pdf
+  // 4. Criar tempDiv visível MAS TAPADO pela cortina
+  //    html2canvas exige que o elemento esteja no viewport para renderizar.
+  //    Colocamos z-index:1 (abaixo da cortina) para o paciente não ver.
   const tempDiv = document.createElement("div");
-  tempDiv.style.cssText = "position:fixed;left:-99999px;top:0;width:800px;background:#fff;font-family:'DM Sans',Arial,sans-serif;";
+  tempDiv.style.cssText = [
+    "position:fixed",
+    "top:0",
+    "left:0",
+    "width:800px",
+    "z-index:1",          // por baixo da cortina (999999)
+    "background:#fff",
+    "font-family:'DM Sans',Arial,sans-serif",
+    "overflow:hidden"
+  ].join(";");
   tempDiv.innerHTML = repFrame.innerHTML;
   document.body.appendChild(tempDiv);
 
-  // 6. Gerar PDF e enviar ao Drive
+  // Pausa para o browser renderizar o tempDiv antes do html2canvas capturar
+  await new Promise(r => setTimeout(r, 200));
+
+  // 5. Gerar PDF e enviar ao Drive
   try {
     const opt = {
       margin: [8, 0, 8, 0],
       filename: "resultado.pdf",
       image: { type: "jpeg", quality: 0.97 },
-      html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0, x: 0, y: 0, windowWidth: 800 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        scrollX: 0,
+        scrollY: 0,
+        x: 0,
+        y: 0,
+        windowWidth: 800,
+        logging: false
+      },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
     };
 
