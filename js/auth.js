@@ -56,7 +56,7 @@ function logout(){
 
 function guardAuth(){
   const path = (location.pathname || "").toLowerCase();
-  const isLogin = path.endsWith("/login.html") || path.endsWith("login.html");
+  const isLogin = path.endsWith("/Equilibrium_testes/login.html") || path.endsWith("login.html");
   if(isLogin) return true;
 
   if(isAuthed()) return true;
