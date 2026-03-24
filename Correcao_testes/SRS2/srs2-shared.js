@@ -335,7 +335,7 @@ function countMissingByScale(form){
 
 // ─── SVG: Perfil ─────────────────────────────────────────────────────────────
 function svgProfileChart(rows){
-  const W=860, H=420;
+  const W=720, H=200;
   const left=100, right=260, top=50, bottom=40;
   const plotW=W-left-right, plotH=H-top-bottom;
   const tMin=20, tMax=80;
@@ -419,7 +419,7 @@ function svgProfileChart(rows){
 
 // ─── SVG: Sino ───────────────────────────────────────────────────────────────
 function svgBell(t){
-  const W=400, H=130;
+  const W=500, H=160;
   const tMin=20, tMax=80;
   const xPad=20, baseY=H-28, plotW=W-xPad*2;
 
@@ -452,7 +452,7 @@ function svgBell(t){
     ${[20,30,40,50,60,70,80].map(v=>`
       <text x="${xOfT(v)}" y="${baseY+16}" text-anchor="middle" font-size="10" fill="#64748b">${v}</text>
     `).join("")}
-    <text x="${xt}" y="${baseY-95}" text-anchor="middle" font-size="10" fill="${color}" font-weight="800">T=${tv??'—'}</text>
+    <text x="${xt}" y="${baseY-100}" text-anchor="middle" font-size="9" fill="${color}" font-weight="800">T=${tv??'—'}</text>
   </svg>`;
 }
 
