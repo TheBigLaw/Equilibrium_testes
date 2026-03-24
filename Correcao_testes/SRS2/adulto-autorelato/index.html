@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SRS-2 · Adulto — Autorrelato | Equilibrium</title>
+  <link rel="icon" type="image/png" href="../logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../srs2-shared.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    /* ━━━ MODO PACIENTE — estilos específicos desta página ━━━ */
+
+    /* Layout principal */
+    body { background: #f0f4f8; }
+    .p-shell {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 24px 16px 110px;
+    }
+
+    /* ── Cabeçalho ── */
+    .p-header {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 8px rgba(0,0,0,.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .p-brand { display: flex; align-items: center; gap: 12px; }
+    .p-logo  { height: 36px; }
+    .p-brand-name { font-weight: 800; font-size: 15px; color: #1e293b; }
+    .p-brand-sub  { font-size: 11px; color: #64748b; }
+    .p-test { text-align: right; }
+    .p-test-name  { font-weight: 700; font-size: 16px; color: var(--srs-accent, #1a56db); }
+    .p-test-count { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+    /* ── Barra de progresso ── */
+    .p-progress-bar {
+      height: 5px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .p-progress-fill {
+      height: 100%;
+      background: var(--srs-accent, #1a56db);
+      width: 0%;
+      transition: width .35s ease;
+      border-radius: 4px;
+    }
+
+    /* ── Card de formulário ── */
+    .p-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 28px 32px;
+      box-shadow: 0 1px 8px rgba(0,0,0,.07);
+    }
+
+    /* ── Campos do paciente ── */
+    .p-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 540px) { .p-fields { grid-template-columns: 1fr; } }
+    .p-field label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 6px;
+    }
+    .p-field input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      background: #fafcff;
+    }
+    .p-field input:focus {
+      border-color: var(--srs-accent, #1a56db);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--srs-accent, #1a56db) 12%, transparent);
+      background: #fff;
+    }
+
+    .p-divider {
+      border: none;
+      border-top: 1.5px solid #f1f5f9;
+      margin: 24px 0;
+    }
+    .p-items-heading {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 20px;
+    }
+
+    /* ── Itens: esconder tags internas ── */
+    .tag { display: none !important; }
+
+    /* ── Rodapé fixo ── */
+    .p-footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top: 1.5px solid #e8edf2;
+      padding: 13px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 200;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+    }
+    .p-footer-info { font-size: 13px; color: #64748b; }
+    .p-footer-info strong { color: #1e293b; font-weight: 700; }
+
+    /* Botão Enviar */
+    .btn-enviar {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--srs-accent, #1a56db);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--srs-accent, #1a56db) 35%, transparent);
+      letter-spacing: .01em;
+      white-space: nowrap;
+    }
+    .btn-enviar:hover   { opacity: .88; transform: translateY(-1px); }
+    .btn-enviar:active  { transform: translateY(0); opacity: 1; }
+    .btn-enviar:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── Máscara de envio ── */
+    .cortina {
+      position: fixed; inset: 0;
+      background: linear-gradient(145deg, #f0f4ff 0%, #ede9fe 100%);
+      z-index: 999999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+    .cortina.ativa { display: flex; }
+    .cortina-icon {
+      font-size: 56px;
+      animation: c-pulse 1.6s ease-in-out infinite;
+    }
+    .cortina-msg {
+      font-size: 22px;
+      font-weight: 800;
+      color: #3730a3;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .cortina-sub {
+      font-size: 14px;
+      color: #6d28d9;
+      text-align: center;
+    }
+    @keyframes c-pulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.1); }
+    }
+
+    /* ── Tela de sucesso ── */
+    .success-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: linear-gradient(145deg, #f0f4ff 0%, #ede9fe 100%);
+    }
+    .success-card {
+      background: #fff;
+      border-radius: 22px;
+      padding: 60px 44px;
+      text-align: center;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(99,102,241,.14);
+    }
+    .success-icon { font-size: 64px; margin-bottom: 22px; }
+    .success-card h1 { font-size: 26px; color: #3730a3; margin: 0 0 14px; }
+    .success-card p  { font-size: 16px; color: #555; line-height: 1.65; margin: 0 0 8px; }
+    .success-note    { font-size: 13px; color: #a0aec0; margin-top: 28px !important; }
+
+    /* ── Esconder tudo que é só do modo interno ── */
+    #repOverlay, #modalGerando { display: none !important; position: absolute; left: -99999px; }
+    .srs-progress-bar { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- ━━ MÁSCARA DE ENVIO (inicialmente oculta) ━━ -->
+  <div class="cortina" id="cortina">
+    <div class="cortina-icon">⏳</div>
+    <div class="cortina-msg" id="cortinaMsg">A processar as suas respostas…</div>
+    <div class="cortina-sub">Por favor, não feche esta página.</div>
+  </div>
+
+  <!-- ━━ CONTEÚDO PRINCIPAL ━━ -->
+  <div class="p-shell" id="appShell">
+
+    <!-- Cabeçalho -->
+    <div class="p-header">
+      <div class="p-brand">
+        <img src="../logo2.png" alt="Equilibrium" class="p-logo"
+             onerror="this.style.display='none'">
+        <div>
+          <div class="p-brand-name">Equilibrium</div>
+          <div class="p-brand-sub">Neuropsicologia</div>
+        </div>
+      </div>
+      <div class="p-test">
+        <div class="p-test-name" id="subtitle">Carregando…</div>
+        <div class="p-test-count">
+          Respondidos: <strong id="pillAnswered">0/—</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de progresso -->
+    <div class="p-progress-bar">
+      <div class="p-progress-fill" id="patientProgressFill"></div>
+    </div>
+
+    <!-- Card principal -->
+    <div class="p-card">
+
+      <!-- Dados do paciente -->
+      <div class="p-fields">
+        <div class="p-field">
+          <label>Nome do paciente</label>
+          <input id="paciente" type="text" placeholder="Nome completo" autocomplete="name" />
+        </div>
+        <div class="p-field">
+          <label>Data da avaliação</label>
+          <input id="data" type="date" />
+        </div>
+      </div>
+
+      <!-- Stubs exigidos pelo srs2-shared.js (ocultos) -->
+      <span id="hintForm"    style="display:none"></span>
+      <span id="pillForm"    style="display:none"></span>
+      <span id="summaryLine" style="display:none"></span>
+      <table id="tblResultados" style="display:none"><tbody></tbody></table>
+
+      <hr class="p-divider" />
+      <div class="p-items-heading">Por favor, responda todos os itens abaixo</div>
+
+      <!-- Itens injetados pelo JS -->
+      <div id="itens" class="itens"></div>
+
+    </div>
+  </div><!-- /p-shell -->
+
+  <!-- ━━ RODAPÉ FIXO ━━ -->
+  <div class="p-footer">
+    <div class="p-footer-info">
+      Respondidos: <strong id="footerAnswered">0</strong>
+      de <strong id="footerTotal">—</strong>
+    </div>
+    <button class="btn-enviar" id="btnEnviar" type="button">
+      📤 Enviar Respostas
+    </button>
+  </div>
+
+  <!-- ━━ RELATÓRIO OCULTO — gerado internamente para PDF ━━ -->
+  <div id="repOverlay" style="width:800px; background:#fff; font-family:'DM Sans',Arial,sans-serif;">
+    <div class="srs-report-scroll">
+      <div class="srs-report-frame"></div>
+    </div>
+  </div>
+  <div id="modalGerando"></div>
+
+  <!-- Campo avaliador oculto (referenciado pelo shared.js) -->
+  <input id="avaliador" type="hidden" value="Paciente" />
+
+  <script>
+    const FORM_KEY               = "adulto_autorrelato";
+    const SRS_ACCENT_VAR         = "--srs-adulto-auto";
+    const URL_DO_GOOGLE_SCRIPT   = "https://script.google.com/macros/s/AKfycbwBUzlAykhgVOjW9HKAKGjXkgnA8SkjRdgGk5CstrM-uMYkSxAbHEQHieb2N29etYY7/exec";
+  </script>
+  <script src="../srs2-shared.js"></script>
+
+</body>
+</html>
