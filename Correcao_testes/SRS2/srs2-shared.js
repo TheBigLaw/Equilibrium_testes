@@ -700,64 +700,92 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ══════════════════════════════════════════════════════════════════════════════
 
 async function finalizarEEnviar() {
-  // 1. Calcular resultados
+
+  // ── 1. Calcular scores ────────────────────────────────────────────────────
   const result = calcularEExibir();
   if (!result) return;
-
   const form = getForm();
   if (!form) return;
 
-  // 2. Mostrar máscara PRIMEIRO (cobre o ecrã, z-index 999999)
+  // ── 2. Gerar HTML do relatório num contentor de renderização ──────────────
+  //    Usamos um div FORA do ecrã horizontalmente (left: -9999px) mas com
+  //    posição absolute (não fixed) para que o browser possa calcular a altura
+  //    completa do documento sem corte. O html2canvas consegue capturar
+  //    elementos fora do viewport se usarmos o método .from() com a opção
+  //    windowWidth e height explícita calculada pelo scrollHeight.
+  abrirRelatorio(result);
+
+  const repFrame = document.querySelector("#repOverlay .srs-report-frame");
+  if (!repFrame || !repFrame.innerHTML.trim()) {
+    alert("Erro interno: relatório vazio. Tente novamente.");
+    return;
+  }
+
+  // ── 3. Contentor de captura (invisível ao paciente) ───────────────────────
+  const captureWrap = document.createElement("div");
+  captureWrap.id = "__srs2_capture__";
+  captureWrap.style.cssText = [
+    "position:absolute",   // absolute, não fixed — sem corte de altura
+    "top:0",
+    "left:-9999px",        // fora do ecrã lateralmente
+    "width:794px",         // largura A4 a 96dpi
+    "background:#fff",
+    "font-family:'DM Sans',Arial,sans-serif",
+    "z-index:0",
+    "pointer-events:none"
+  ].join(";");
+
+  captureWrap.innerHTML = repFrame.innerHTML;
+  document.body.appendChild(captureWrap);
+
+  // Pausa para o browser calcular layout (scrollHeight) do captureWrap
+  await new Promise(r => requestAnimationFrame(() => setTimeout(r, 100)));
+
+  const captureHeight = captureWrap.scrollHeight;
+
+  // ── 4. Mostrar cortina (só agora — o layout já está calculado) ────────────
   const btnEnviar = document.getElementById("btnEnviar");
   if (btnEnviar) { btnEnviar.disabled = true; btnEnviar.textContent = "A processar…"; }
 
   const cortina = document.createElement("div");
-  cortina.className = "cortina-envio";
-  cortina.id = "cortina-envio";
+  cortina.id = "__srs2_cortina__";
+  cortina.style.cssText = [
+    "position:fixed","inset:0",
+    "background:linear-gradient(145deg,#f0f4ff 0%,#ede9fe 100%)",
+    "z-index:999999",
+    "display:flex","flex-direction:column",
+    "align-items:center","justify-content:center","gap:18px"
+  ].join(";");
   cortina.innerHTML = `
-    <div class="cortina-icon">⏳</div>
-    <div class="cortina-msg">A processar as suas respostas…</div>
-    <div class="cortina-sub">Por favor, não feche esta página.</div>
+    <div style="font-size:52px;animation:srs2pulse 1.5s ease-in-out infinite">⏳</div>
+    <div id="__srs2_msg__" style="font-size:21px;font-weight:800;color:#3730a3;text-align:center;padding:0 20px">A processar as suas respostas…</div>
+    <div style="font-size:14px;color:#6d28d9;text-align:center">Por favor, não feche esta página.</div>
+    <style>@keyframes srs2pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}</style>
   `;
-  // Garantir z-index alto o suficiente para tapar tudo
-  cortina.style.zIndex = "999999";
   document.body.appendChild(cortina);
 
-  // Pequena pausa para o browser pintar a cortina antes de continuar
-  await new Promise(r => setTimeout(r, 80));
+  // Pausa para o browser pintar a cortina
+  await new Promise(r => setTimeout(r, 120));
 
-  // 3. Gerar HTML do relatório
-  abrirRelatorio(result);
-  const repFrame = document.querySelector("#repOverlay .srs-report-frame");
-  if (!repFrame || !repFrame.innerHTML.trim()) {
-    cortina.innerHTML = `<div class="cortina-msg" style="color:#dc2626">Erro ao gerar relatório.<br>Tente novamente.</div>`;
-    if (btnEnviar) { btnEnviar.disabled = false; btnEnviar.textContent = "📤 Enviar Respostas"; }
-    setTimeout(() => cortina.remove(), 3000);
-    return;
-  }
+  const setMsg = (txt) => {
+    const el = document.getElementById("__srs2_msg__");
+    if (el) el.textContent = txt;
+  };
 
-  // 4. Criar tempDiv visível MAS TAPADO pela cortina
-  //    html2canvas exige que o elemento esteja no viewport para renderizar.
-  //    Colocamos z-index:1 (abaixo da cortina) para o paciente não ver.
-  const tempDiv = document.createElement("div");
-  tempDiv.style.cssText = [
-    "position:fixed",
-    "top:0",
-    "left:0",
-    "width:800px",
-    "z-index:1",          // por baixo da cortina (999999)
-    "background:#fff",
-    "font-family:'DM Sans',Arial,sans-serif",
-    "overflow:hidden"
-  ].join(";");
-  tempDiv.innerHTML = repFrame.innerHTML;
-  document.body.appendChild(tempDiv);
-
-  // Pausa para o browser renderizar o tempDiv antes do html2canvas capturar
-  await new Promise(r => setTimeout(r, 200));
-
-  // 5. Gerar PDF e enviar ao Drive
+  let tempDiv;
   try {
+
+    // ── 5. Mover conteúdo para div renderizável COM dimensões exactas ─────
+    //    Agora que a cortina está visível, podemos tornar o div visível
+    //    (left:0) para o html2canvas capturar correctamente.
+    captureWrap.style.left = "0";
+    captureWrap.style.top  = "0";
+
+    // Pausa extra para repintura
+    await new Promise(r => setTimeout(r, 150));
+
+    setMsg("A formatar o relatório em PDF…");
+
     const opt = {
       margin: [8, 0, 8, 0],
       filename: "resultado.pdf",
@@ -770,30 +798,29 @@ async function finalizarEEnviar() {
         scrollY: 0,
         x: 0,
         y: 0,
-        windowWidth: 800,
+        width:  794,
+        height: captureHeight,
+        windowWidth:  794,
+        windowHeight: captureHeight,
         logging: false
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
     };
 
-    cortina.querySelector(".cortina-msg").textContent = "A formatar o relatório em PDF…";
+    const pdfUri = await html2pdf().set(opt).from(captureWrap).outputPdf("datauristring");
 
-    const pdfUri = await html2pdf().set(opt).from(tempDiv).outputPdf("datauristring");
-    document.body.removeChild(tempDiv);
+    // Remove div de captura
+    document.body.removeChild(captureWrap);
 
-    cortina.querySelector(".cortina-msg").textContent = "A enviar com segurança…";
+    // ── 6. Enviar ao Drive ─────────────────────────────────────────────────
+    setMsg("A enviar com segurança…");
 
     const base64 = pdfUri.split(",")[1];
     const nomePaciente = (document.getElementById("paciente")?.value?.trim() || "Paciente_Sem_Nome");
     const formKey      = (typeof FORM_KEY !== "undefined" ? FORM_KEY : "srs2");
+    const urlScript    = (typeof URL_DO_GOOGLE_SCRIPT !== "undefined") ? URL_DO_GOOGLE_SCRIPT : null;
 
-    const urlScript = (typeof URL_DO_GOOGLE_SCRIPT !== "undefined")
-      ? URL_DO_GOOGLE_SCRIPT
-      : null;
-
-    if (!urlScript) {
-      throw new Error("URL_DO_GOOGLE_SCRIPT não definida na página.");
-    }
+    if (!urlScript) throw new Error("URL_DO_GOOGLE_SCRIPT não definida na página.");
 
     const res  = await fetch(urlScript, {
       method: "POST",
@@ -802,7 +829,6 @@ async function finalizarEEnviar() {
     const data = await res.json();
 
     if (data.status === "sucesso") {
-      // Tela de sucesso limpa
       document.body.innerHTML = `
         <div class="success-screen">
           <div class="success-card">
@@ -819,9 +845,10 @@ async function finalizarEEnviar() {
 
   } catch (err) {
     console.error("Erro ao enviar:", err);
-    // Remove temp div se ainda existir
-    if (tempDiv.parentNode) document.body.removeChild(tempDiv);
-    cortina.remove();
+    const cw = document.getElementById("__srs2_capture__");
+    if (cw && cw.parentNode) document.body.removeChild(cw);
+    const ct = document.getElementById("__srs2_cortina__");
+    if (ct) ct.remove();
     if (btnEnviar) { btnEnviar.disabled = false; btnEnviar.textContent = "📤 Enviar Respostas"; }
     alert("Não foi possível enviar as respostas.\n\nVerifique a sua ligação à internet e tente novamente.\n\nDetalhe: " + err.message);
   }
